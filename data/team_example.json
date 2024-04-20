@@ -1,0 +1,101 @@
+{
+  "Dream Team": {
+    "George Goalie": {
+      "skill": 3,
+      "positions": [
+        "G"
+      ]
+    },
+    "Gustavo Goalie": {
+      "skill": 5,
+      "positions": [
+        "G"
+      ]
+    },
+    "Daniel Defender": {
+      "skill": 4,
+      "positions": [
+        "LD",
+        "C"
+      ]
+    },
+    "David Defender": {
+      "skill": 3,
+      "positions": [
+        "LD",
+        "RD"
+      ]
+    },
+    "Dylan Defender": {
+      "skill": 2,
+      "positions": [
+        "RD"
+      ]
+    },
+    "Donn Defender": {
+      "skill": 1,
+      "positions": [
+        "RD",
+        "RW"
+      ]
+    },
+    "Din Defender": {
+      "skill": 3,
+      "positions": [
+        "RD"
+      ]
+    },
+    "Walter Wing": {
+      "skill": 4,
+      "positions": [
+        "C",
+        "LW",
+        "RW"
+      ]
+    },
+    "Wendy Wing": {
+      "skill": 3,
+      "positions": [
+        "LW"
+      ]
+    },
+    "Wanda Wing": {
+      "skill": 2,
+      "positions": [
+        "RW"
+      ]
+    },
+    "Wesley Wing": {
+      "skill": 1,
+      "positions": [
+        "C",
+        "LW"
+      ]
+    },
+    "Wally Wing": {
+      "skill": 3,
+      "positions": [
+        "RW"
+      ]
+    },
+    "Willy Wing": {
+      "skill": 4,
+      "positions": [
+        "RW"
+      ]
+    },
+    "Coby Center": {
+      "skill": 5,
+      "positions": [
+        "C"
+      ]
+    },
+    "Cody Center": {
+      "skill": 4,
+      "positions": [
+        "C",
+        "RW"
+      ]
+    }
+  }
+}

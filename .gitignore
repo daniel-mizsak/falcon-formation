@@ -1,0 +1,42 @@
+# Project
+data/team.json
+encrypt.sh
+encryption.key
+
+# System
+.DS_Store
+*.log
+
+# Byte-compiled
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / Packaging
+.eggs/
+*.egg
+*.egg-info/
+build/
+dist/
+eggs/
+sdist/
+wheels/
+
+# Unit test / Coverage reports
+.coverage
+.tox
+coverage.xml
+htmlcov/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environments
+.env
+.venv
+env/
+venv/
+
+# IDE
+.idea/
+.vscode/

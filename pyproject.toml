@@ -1,0 +1,55 @@
+# Build System
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Project Metadata
+[project]
+name = "falcon-formation"
+version = "0.0.1"
+description = "Create evenly distributed hockey teams."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Daniel Mizsak", email = "info@pythonvilag.hu" }]
+keywords = ["falcons", "hockey", "team", "split"]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = ["python-dotenv", "requests", "types-requests"]
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "pre-commit",
+    "pytest-cov",
+    "pytest",
+    "requests-mock",
+    "ruff",
+    "tox",
+]
+[project.scripts]
+falcon-formation = "falcon_formation.main:main"
+[project.urls]
+Repository = "https://github.com/daniel-mizsak/falcon-formation"
+
+# Tools
+# MyPy
+[tool.mypy]
+ignore_missing_imports = true
+pretty = true
+show_column_numbers = true
+show_error_context = true
+strict = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+# Pytest
+[tool.pytest.ini_options]
+addopts = "--cov=falcon_formation --cov=tests --cov-config=pyproject.toml --cov-report=term-missing --cov-report=html --cov-report=xml"
+testpaths = ["tests"]
+
+# Coverage
+[tool.coverage.report]
+exclude_also = ["if TYPE_CHECKING:"]
