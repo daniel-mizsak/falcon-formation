@@ -4,18 +4,23 @@ Tests for the falcon_formation.create_teams module.
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
+import textwrap
 from math import factorial
 from pathlib import Path
 
 from falcon_formation.create_teams import (
     Player,
+    TeamData,
     TeamMetrics,
+    _assign_me_to_team_red,
     _calculate_defense_number_difference,
     _calculate_goalie_number_difference,
     _calculate_skill_level_difference,
-    assign_me_to_team_red,
-    calculate_team_metrics,
-    generate_every_team_combination,
+    _calculate_team_metrics,
+    _generate_every_team_combination,
+    generate_output,
+    get_best_team,
+    get_players,
     load_team_data,
 )
 
@@ -64,6 +69,31 @@ def test_team_metrics_operators() -> None:
     assert team_metrics_1 > team_metrics_6
 
 
+def test_team_data() -> None:
+    team_data = TeamData(
+        teams=(
+            {
+                Player(name="George Goalie", skill=3, positions=frozenset(["G"])),
+                Player(name="Daniel Defender", skill=4, positions=frozenset(["LD", "C"])),
+            },
+            {
+                Player(name="Gustavo Goalie", skill=5, positions=frozenset(["G"])),
+                Player(name="David Defender", skill=3, positions=frozenset(["LD", "RD"])),
+            },
+        ),
+        metrics=TeamMetrics(skill_difference=1, goalie_number_difference=0, defense_number_difference=0),
+    )
+
+    assert isinstance(team_data, TeamData)
+
+    # assert isinstance(team_data.teams, TeamDistribution)  # noqa: ERA001
+    assert len(team_data.teams) == 2
+    assert isinstance(team_data.teams[0], set)
+    assert isinstance(team_data.teams[1], set)
+
+    assert isinstance(team_data.metrics, TeamMetrics)
+
+
 def test_load_team_data() -> None:
     team_data_path = Path("data/team_example.json")
     team_name = "Dream Team"
@@ -77,10 +107,55 @@ def test_load_team_data() -> None:
     assert team_data[-1] == Player(name="Cody Center", skill=4, positions=frozenset({"C", "RW"}))
 
 
+def test_get_players(team_data: list[Player]) -> None:
+    registered_players = [
+        "George Goalie",
+        "Gustavo Goalie",
+        "Daniel Defender",
+        "David Defender",
+        "Wally Wing",
+        "Willy Wing",
+        "Cody Center",
+        "Adam Anonymus",
+    ]
+
+    players, unknown_players, players_with_missing_data = get_players(team_data, registered_players)
+
+    assert isinstance(players, list)
+    assert len(players) == 8
+    assert isinstance(players[0], Player)
+
+    assert isinstance(unknown_players, list)
+    assert len(unknown_players) == 1
+    assert unknown_players[0] == "Adam Anonymus"
+
+    assert isinstance(players_with_missing_data, list)
+    assert len(players_with_missing_data) == 1
+    assert players_with_missing_data[0] == "Willy Wing"
+
+
+def test_best_team() -> None:
+    players = [
+        Player(name="George Goalie", skill=3, positions=frozenset("G")),
+        Player(name="Gustavo Goalie", skill=5, positions=frozenset("G")),
+        Player(name="Daniel Defender", skill=4, positions=frozenset({"LD", "C"})),
+    ]
+
+    best_team = get_best_team(players)
+
+    assert isinstance(best_team, TeamData)
+    assert len(best_team.teams) == 2
+    assert isinstance(best_team.teams[0], set)
+    assert isinstance(best_team.teams[1], set)
+
+    assert isinstance(best_team.metrics, TeamMetrics)
+    # TODO: Assert concrete values
+
+
 def test_generate_every_team_combination(team_data: list[Player]) -> None:
     number_of_team_combinations = 0
 
-    for team_1, team_2 in generate_every_team_combination(team_data):
+    for team_1, team_2 in _generate_every_team_combination(team_data):
         assert isinstance(team_1, set)
         assert len(team_1) == len(team_data) // 2
 
@@ -97,8 +172,8 @@ def test_generate_every_team_combination(team_data: list[Player]) -> None:
 
 
 def test_calculate_team_metrics(team_data: list[Player]) -> None:
-    for teams in generate_every_team_combination(team_data):
-        team_metrics = calculate_team_metrics(teams)
+    for teams in _generate_every_team_combination(team_data):
+        team_metrics = _calculate_team_metrics(teams)
 
         goalie_number_difference = _calculate_goalie_number_difference(teams)
         defense_number_difference = _calculate_defense_number_difference(teams)
@@ -111,7 +186,7 @@ def test_calculate_team_metrics(team_data: list[Player]) -> None:
 
 
 def test_calculate_skill_level_difference(team_data: list[Player]) -> None:
-    for teams in generate_every_team_combination(team_data):
+    for teams in _generate_every_team_combination(team_data):
         skill_level_difference = _calculate_skill_level_difference(teams)
 
         team_1, team_2 = teams
@@ -122,7 +197,7 @@ def test_calculate_skill_level_difference(team_data: list[Player]) -> None:
 
 
 def test_calculate_goalie_number_difference(team_data: list[Player]) -> None:
-    for teams in generate_every_team_combination(team_data):
+    for teams in _generate_every_team_combination(team_data):
         goalie_number_difference = _calculate_goalie_number_difference(teams)
 
         team_1, team_2 = teams
@@ -133,7 +208,7 @@ def test_calculate_goalie_number_difference(team_data: list[Player]) -> None:
 
 
 def test_calculate_defense_number_difference(team_data: list[Player]) -> None:
-    for teams in generate_every_team_combination(team_data):
+    for teams in _generate_every_team_combination(team_data):
         defense_number_difference = _calculate_defense_number_difference(teams)
 
         team_1, team_2 = teams
@@ -143,10 +218,52 @@ def test_calculate_defense_number_difference(team_data: list[Player]) -> None:
         assert defense_number_difference == abs(defense_number_team_1 - defense_number_team_2)
 
 
+def test_generate_output() -> None:
+    date = "2024-01-01"
+    best_team = TeamData(
+        teams=(
+            {
+                Player(name="George Goalie", skill=3, positions=frozenset("G")),
+                Player(name="Daniel Mizsak", skill=4, positions=frozenset({"LD", "C"})),
+            },
+            {
+                Player(name="Gustavo Goalie", skill=5, positions=frozenset("G")),
+                Player(name="David Defender", skill=3, positions=frozenset({"LD", "RD"})),
+            },
+        ),
+        metrics=TeamMetrics(skill_difference=1, goalie_number_difference=0, defense_number_difference=0),
+    )
+    players_with_missing_data = ["Willy Wing"]
+    unknown_players = ["Adam Anonymus"]
+
+    output = generate_output(date, best_team, players_with_missing_data, unknown_players)
+
+    assert isinstance(output, str)
+    assert output == textwrap.dedent("""\
+                                     Date: 2024-01-01
+
+                                     Team Red: (2)
+                                     Daniel Mizsak
+                                     George Goalie
+
+                                     Team Green: (2)
+                                     David Defender
+                                     Gustavo Goalie
+
+                                     Players with missing data: Willy Wing
+                                     Unknown players: Adam Anonymus
+
+                                     Skill difference: 1
+                                     Goalie number difference: 0
+                                     Defense number difference: 0
+
+                                     """)
+
+
 def test_assign_me_to_team_red(team_data: list[Player]) -> None:
-    for teams in generate_every_team_combination(team_data):
+    for teams in _generate_every_team_combination(team_data):
         my_name = "Daniel Defender"
-        team_red, team_green = assign_me_to_team_red(teams, my_name)
+        team_red, team_green = _assign_me_to_team_red(teams, my_name)
 
         assert isinstance(team_red, list)
         assert isinstance(team_green, list)
