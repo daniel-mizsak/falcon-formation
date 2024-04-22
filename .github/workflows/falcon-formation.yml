@@ -46,9 +46,22 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
+      - name: Save message as file. # like in the previous step
+        run: |
+            cat <<EOF > falcon-formation.txt
+            ${{ env.MESSAGE }}
+            EOF
+
+      - name: Save message file as artifact.
+        uses: actions/upload-artifact@v4
+        with:
+          name: falcon-formation
+          path: falcon-formation.txt
+          retention-days: 5
+
       - name: Send telegram message.
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_CHAT_ID }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: ${{ env.MESSAGE}}
+          message: ${{ env.MESSAGE }}
