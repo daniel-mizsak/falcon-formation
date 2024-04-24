@@ -60,11 +60,10 @@ def falcon_formation() -> str:
     # TODO: Add easy option to add extra players
 
     # Extra players
-    players.append(Player(name="Nikolaj", skill=3, positions=frozenset({"G"})))
-    players.append(Player(name="Oliver Amar Jets", skill=3, positions=frozenset({})))
-    players.append(Player(name="Oliver", skill=3, positions=frozenset({})))
-    players.append(Player(name="Marcus", skill=3, positions=frozenset({})))
-    unknown_players.extend(["Nikolaj", "Oliver Amar Jets", "Oliver", "Marcus"])
+    extra_players: list[Player] = [
+        # Player(name="name", skill=3, positions=frozenset({"G"})),  # noqa: ERA001
+    ]
+    players.extend(extra_players)
 
     # Get the best team
     best_team = get_best_team(players)
