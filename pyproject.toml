@@ -29,8 +29,10 @@ dev = [
     "ruff",
     "tox",
 ]
+
 [project.scripts]
 falcon-formation = "falcon_formation.main:main"
+
 [project.urls]
 Repository = "https://github.com/daniel-mizsak/falcon-formation"
 
@@ -52,4 +54,5 @@ testpaths = ["tests"]
 
 # Coverage
 [tool.coverage.report]
-exclude_also = ["if TYPE_CHECKING:"]
+exclude_also = ["if TYPE_CHECKING:", "if __name__ == '__main__':"]
+omit = ["**/__main__.py"]
