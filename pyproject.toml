@@ -31,7 +31,7 @@ dev = [
 ]
 
 [project.scripts]
-falcon-formation = "falcon_formation.main:main"
+falcon-formation = "falcon_formation.cli:main"
 
 [project.urls]
 Repository = "https://github.com/daniel-mizsak/falcon-formation"

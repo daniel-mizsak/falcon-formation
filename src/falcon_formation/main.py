@@ -5,8 +5,6 @@ Main module of the Falcon Formation application.
 """
 
 import os
-import sys
-import time
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -14,24 +12,12 @@ from dotenv import dotenv_values
 
 from falcon_formation.create_teams import (
     Player,
+    choose_best_team,
     generate_output,
-    get_best_team,
     get_players,
     load_team_data,
 )
 from falcon_formation.holdsport_api import get_registered_players
-
-
-def main() -> int:
-    """Main function of the Falcon Formation application."""
-    start_time = time.time()
-
-    print(falcon_formation())  # noqa: T201
-
-    end_time = time.time()
-    print(f"Execution time: {end_time - start_time:.2f} seconds.")  # noqa: T201
-
-    return 0
 
 
 def falcon_formation() -> str:
@@ -65,12 +51,8 @@ def falcon_formation() -> str:
     ]
     players.extend(extra_players)
 
-    # Get the best team
-    best_team = get_best_team(players)
+    # Randomly choose one of the best team combinations
+    best_team = choose_best_team(players)
 
     # Create output
     return generate_output(date, best_team, players_with_missing_data, unknown_players)
-
-
-if __name__ == "__main__":
-    sys.exit(main())

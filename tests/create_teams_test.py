@@ -18,8 +18,8 @@ from falcon_formation.create_teams import (
     _calculate_skill_level_difference,
     _calculate_team_metrics,
     _generate_every_team_combination,
+    choose_best_team,
     generate_output,
-    get_best_team,
     get_players,
     load_team_data,
 )
@@ -141,7 +141,7 @@ def test_best_team() -> None:
         Player(name="Daniel Defender", skill=4, positions=frozenset({"LD", "C"})),
     ]
 
-    best_team = get_best_team(players)
+    best_team = choose_best_team(players)
 
     assert isinstance(best_team, TeamData)
     assert len(best_team.teams) == 2

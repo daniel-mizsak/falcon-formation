@@ -100,7 +100,7 @@ def get_players(team_data: list[Player], registered_players: list[str]) -> tuple
     return players, unknown_players, players_with_missing_data
 
 
-def get_best_team(players: list[Player]) -> TeamData:
+def choose_best_team(players: list[Player]) -> TeamData:
     """Return one team and its corresponding metrics from the teams with the best metrics.
 
     Args:
