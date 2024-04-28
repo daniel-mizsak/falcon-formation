@@ -23,7 +23,7 @@ class Player:
 
     name: str
     skill: int
-    positions: frozenset[str]
+    positions: tuple[str, ...]
 
 
 @dataclass(eq=True, order=True, frozen=True)
@@ -64,7 +64,7 @@ def load_team_data(team_data_path: Path, team_name: str) -> list[Player]:
         player = Player(
             name=str(player_name),
             skill=int(json_data[player_name]["skill"]),
-            positions=frozenset(json_data[player_name]["positions"]),
+            positions=tuple(json_data[player_name]["positions"]),
         )
         team_data.append(player)
     return team_data
@@ -94,7 +94,7 @@ def get_players(team_data: list[Player], registered_players: list[str]) -> tuple
             if not player.skill or not player.positions:
                 players_with_missing_data.append(player_name)
         else:
-            players.append(Player(name=player_name, skill=3, positions=frozenset()))
+            players.append(Player(name=player_name, skill=3, positions=()))
             unknown_players.append(player_name)
 
     return players, unknown_players, players_with_missing_data

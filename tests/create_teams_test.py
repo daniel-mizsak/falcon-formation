@@ -27,7 +27,7 @@ from falcon_formation.create_teams import (
 
 
 def test_player() -> None:
-    player = Player(name="George Goalie", skill=3, positions=frozenset(["G"]))
+    player = Player(name="George Goalie", skill=3, positions=tuple("G"))
     assert isinstance(player, Player)
 
     assert isinstance(player.name, str)
@@ -36,8 +36,8 @@ def test_player() -> None:
     assert isinstance(player.skill, int)
     assert player.skill == 3
 
-    assert isinstance(player.positions, frozenset)
-    assert player.positions == frozenset(["G"])
+    assert isinstance(player.positions, tuple)
+    assert player.positions == tuple("G")
 
 
 def test_team_metrics() -> None:
@@ -75,12 +75,12 @@ def test_team_data() -> None:
     team_data = TeamData(
         teams=(
             {
-                Player(name="George Goalie", skill=3, positions=frozenset(["G"])),
-                Player(name="Daniel Defender", skill=4, positions=frozenset(["LD", "C"])),
+                Player(name="George Goalie", skill=3, positions=tuple("G")),
+                Player(name="Daniel Defender", skill=4, positions=("LD", "C")),
             },
             {
-                Player(name="Gustavo Goalie", skill=5, positions=frozenset(["G"])),
-                Player(name="David Defender", skill=3, positions=frozenset(["LD", "RD"])),
+                Player(name="Gustavo Goalie", skill=5, positions=tuple("G")),
+                Player(name="David Defender", skill=3, positions=("LD", "RD")),
             },
         ),
         metrics=TeamMetrics(skill_difference=1, goalie_number_difference=0, defense_number_difference=0),
@@ -104,9 +104,9 @@ def test_load_team_data() -> None:
 
     assert isinstance(team_data, list)
     assert len(team_data) == 15
-    assert team_data[0] == Player(name="George Goalie", skill=3, positions=frozenset("G"))
-    assert team_data[1] == Player(name="Gustavo Goalie", skill=5, positions=frozenset("G"))
-    assert team_data[-1] == Player(name="Cody Center", skill=4, positions=frozenset({"C", "RW"}))
+    assert team_data[0] == Player(name="George Goalie", skill=3, positions=tuple("G"))
+    assert team_data[1] == Player(name="Gustavo Goalie", skill=5, positions=tuple("G"))
+    assert team_data[-1] == Player(name="Cody Center", skill=4, positions=("C", "RW"))
 
 
 def test_get_players(team_data: list[Player]) -> None:
@@ -138,9 +138,9 @@ def test_get_players(team_data: list[Player]) -> None:
 
 def test_best_team() -> None:
     players = [
-        Player(name="George Goalie", skill=3, positions=frozenset("G")),
-        Player(name="Gustavo Goalie", skill=5, positions=frozenset("G")),
-        Player(name="Daniel Defender", skill=4, positions=frozenset({"LD", "C"})),
+        Player(name="George Goalie", skill=3, positions=tuple("G")),
+        Player(name="Gustavo Goalie", skill=5, positions=tuple("G")),
+        Player(name="Daniel Defender", skill=4, positions=("LD", "C")),
     ]
 
     best_team = choose_best_team(players)
@@ -203,8 +203,8 @@ def test_calculate_defense_number_difference(team_data: list[Player]) -> None:
         defense_number_difference = _calculate_defense_number_difference(teams)
 
         team_1, team_2 = teams
-        defense_number_team_1 = len([player for player in team_1 if player.positions.intersection({"RD", "LD"})])
-        defense_number_team_2 = len([player for player in team_2 if player.positions.intersection({"RD", "LD"})])
+        defense_number_team_1 = len([player for player in team_1 if set(player.positions).intersection({"RD", "LD"})])
+        defense_number_team_2 = len([player for player in team_2 if set(player.positions).intersection({"RD", "LD"})])
 
         assert defense_number_difference == abs(defense_number_team_1 - defense_number_team_2)
 
@@ -225,12 +225,12 @@ def test_generate_output() -> None:
     best_team = TeamData(
         teams=(
             {
-                Player(name="George Goalie", skill=3, positions=frozenset("G")),
-                Player(name="Daniel Mizsak", skill=4, positions=frozenset({"LD", "C"})),
+                Player(name="George Goalie", skill=3, positions=tuple("G")),
+                Player(name="Daniel Mizsak", skill=4, positions=("LD", "C")),
             },
             {
-                Player(name="Gustavo Goalie", skill=5, positions=frozenset("G")),
-                Player(name="David Defender", skill=3, positions=frozenset({"LD", "RD"})),
+                Player(name="Gustavo Goalie", skill=5, positions=tuple("G")),
+                Player(name="David Defender", skill=3, positions=("LD", "RD")),
             },
         ),
         metrics=TeamMetrics(skill_difference=1, goalie_number_difference=0, defense_number_difference=0),
