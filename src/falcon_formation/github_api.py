@@ -9,7 +9,7 @@ import zipfile
 
 import requests
 
-STATUS_CODE_OK = 200
+from falcon_formation import STATUS_CODE_OK
 
 
 def get_artifact_data(api_pat: str) -> str:

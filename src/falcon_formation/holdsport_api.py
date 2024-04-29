@@ -12,6 +12,8 @@ from datetime import datetime
 
 import requests
 
+from falcon_formation import STATUS_CODE_OK
+
 
 def get_registered_players(team_id: int, date: str, auth: tuple[str, str]) -> list[str]:
     """Return the list of players who registered for "Motion A" practice on the given date.
@@ -32,6 +34,8 @@ def get_registered_players(team_id: int, date: str, auth: tuple[str, str]) -> li
     headers = {"Accept": "application/json"}
 
     response = requests.get(url, headers=headers, auth=auth, timeout=5)
+    if response.status_code != STATUS_CODE_OK:
+        return []
     response_dict = json.loads(response.text)
 
     registered_players = []
@@ -58,6 +62,8 @@ def _get_activity_id(team_id: int, date: str, auth: tuple[str, str]) -> int | No
     headers = {"Accept": "application/json"}
 
     response = requests.get(url, headers=headers, auth=auth, timeout=5)
+    if response.status_code != STATUS_CODE_OK:
+        return None
     response_dict = json.loads(response.text)
 
     for response_entry in response_dict:
