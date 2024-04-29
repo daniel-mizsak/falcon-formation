@@ -47,7 +47,9 @@ def falcon_formation() -> str:
 
     # Extra players
     extra_players: list[Player] = [
-        # Player(name="name", skill=3, positions=frozenset({"G"})),  # noqa: ERA001
+        # Player(name="name", skill=3, positions=("G")),  # noqa: ERA001
+        Player(name="Magnus's Guest", skill=3, positions=frozenset()),
+        Player(name="Nikolaj", skill=3, positions=frozenset({"G"})),
     ]
     players.extend(extra_players)
 

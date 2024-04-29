@@ -30,9 +30,9 @@ class Player:
 class TeamMetrics:
     """Data class for storing team metrics."""
 
-    skill_difference: int
     goalie_number_difference: int
     defense_number_difference: int
+    skill_difference: int
 
 
 type TeamDistribution = tuple[set[Player], set[Player]]  # type: ignore[valid-type]
@@ -109,6 +109,7 @@ def choose_best_team(players: list[Player]) -> TeamData:
     Returns:
         TeamData: A team and its corresponding metrics.
     """
+    maximum_number_of_teams = 50000
     best_teams: list[TeamData] = []
     best_team_metrics = None
     random.shuffle(players)
@@ -125,6 +126,9 @@ def choose_best_team(players: list[Player]) -> TeamData:
             best_team_metrics = team_metrics
             best_teams = [TeamData(teams, team_metrics)]
 
+        if len(best_teams) >= maximum_number_of_teams:
+            break
+
     return random.choice(best_teams)  # noqa: S311
 
 
@@ -138,21 +142,10 @@ def _generate_every_team_combination(players: list[Player]) -> Generator[TeamDis
 
 def _calculate_team_metrics(teams: TeamDistribution) -> TeamMetrics:
     return TeamMetrics(
-        skill_difference=_calculate_skill_level_difference(teams),
         goalie_number_difference=_calculate_goalie_number_difference(teams),
         defense_number_difference=_calculate_defense_number_difference(teams),
+        skill_difference=_calculate_skill_level_difference(teams),
     )
-
-
-def _calculate_skill_level_difference(teams: TeamDistribution) -> int:
-    total_team_skills = []
-    for team in teams:
-        total_team_skill = 0
-        for player in team:
-            total_team_skill += player.skill
-        total_team_skills.append(total_team_skill)
-
-    return abs(total_team_skills[0] - total_team_skills[1])
 
 
 def _calculate_goalie_number_difference(teams: TeamDistribution) -> int:
@@ -177,6 +170,17 @@ def _calculate_defense_number_difference(teams: TeamDistribution) -> int:
         total_defense_numbers.append(total_defense_number)
 
     return abs(total_defense_numbers[0] - total_defense_numbers[1])
+
+
+def _calculate_skill_level_difference(teams: TeamDistribution) -> int:
+    total_team_skills = []
+    for team in teams:
+        total_team_skill = 0
+        for player in team:
+            total_team_skill += player.skill
+        total_team_skills.append(total_team_skill)
+
+    return abs(total_team_skills[0] - total_team_skills[1])
 
 
 def generate_output(
