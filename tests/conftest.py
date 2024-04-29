@@ -7,7 +7,8 @@ Short description and source of base code.
 from pathlib import Path
 
 import pytest
-from falcon_formation.create_teams import Player, load_team_data
+from falcon_formation.create_teams import Player
+from falcon_formation.main import load_team_data
 
 
 @pytest.fixture()  # type: ignore[misc]

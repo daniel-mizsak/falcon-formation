@@ -6,7 +6,6 @@ Helper functions for creating equal hockey teams.
 
 from __future__ import annotations
 
-import json
 import random
 from dataclasses import dataclass
 from itertools import combinations
@@ -14,7 +13,6 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-    from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -23,7 +21,7 @@ class Player:
 
     name: str
     skill: int
-    positions: frozenset[str]
+    positions: tuple[str, ...]
 
 
 @dataclass(eq=True, order=True, frozen=True)
@@ -44,30 +42,6 @@ class TeamData:
 
     teams: TeamDistribution
     metrics: TeamMetrics
-
-
-def load_team_data(team_data_path: Path, team_name: str) -> list[Player]:
-    """Load team data from a JSON file.
-
-    Args:
-        team_data_path (Path): Path to the JSON file.
-        team_name (str): Name of the team within the JSON file. One JSON file may contain multiple teams.
-
-    Returns:
-        list[Player]: List of Player objects, where each element represents a player in the team.
-    """
-    with team_data_path.open("r", encoding="utf-8") as file_handle:
-        json_data = json.load(file_handle)[team_name]
-
-    team_data = []
-    for player_name in json_data:
-        player = Player(
-            name=str(player_name),
-            skill=int(json_data[player_name]["skill"]),
-            positions=frozenset(json_data[player_name]["positions"]),
-        )
-        team_data.append(player)
-    return team_data
 
 
 def get_players(team_data: list[Player], registered_players: list[str]) -> tuple[list[Player], list[str], list[str]]:
@@ -94,7 +68,7 @@ def get_players(team_data: list[Player], registered_players: list[str]) -> tuple
             if not player.skill or not player.positions:
                 players_with_missing_data.append(player_name)
         else:
-            players.append(Player(name=player_name, skill=3, positions=frozenset()))
+            players.append(Player(name=player_name, skill=3, positions=()))
             unknown_players.append(player_name)
 
     return players, unknown_players, players_with_missing_data
@@ -127,7 +101,7 @@ def choose_best_team(players: list[Player]) -> TeamData:
             best_teams = [TeamData(teams, team_metrics)]
 
         if len(best_teams) >= maximum_number_of_teams:
-            break
+            break  # pragma: no cover
 
     return random.choice(best_teams)  # noqa: S311
 

@@ -67,3 +67,27 @@ def test_get_registered_players_with_non_existing_activity_id() -> None:
         assert activity_id is None
         registered_players = get_registered_players(1, "2024-01-01", ("username", "password"))
         assert registered_players == []
+
+
+def test_get_registered_players_with_not_ok_status_code() -> None:
+    with requests_mock.Mocker() as m:
+        m.get(
+            "https://api.holdsport.dk/v1/activities/1/activities_users",
+            status_code=500,
+        )
+        m.get(
+            "https://api.holdsport.dk/v1/teams/1/activities?date=2024-01-01",
+            text='[{"name": "Motion A practice", "starttime": "2024-01-01T00:00:00+00:00", "id": 1}]',
+        )
+        registered_players = get_registered_players(1, "2024-01-01", ("username", "password"))
+        assert registered_players == []
+
+
+def test_get_activity_id_with_not_ok_status_code() -> None:
+    with requests_mock.Mocker() as m:
+        m.get(
+            "https://api.holdsport.dk/v1/teams/1/activities?date=2024-01-01",
+            status_code=500,
+        )
+        activity_id = _get_activity_id(1, "2024-01-01", ("username", "password"))
+        assert activity_id is None
