@@ -19,7 +19,7 @@ def get_registered_players(team_id: int, date: str, auth: tuple[str, str]) -> li
     """Return the list of players who registered for "Motion A" practice on the given date.
 
     Args:
-        team_id (int): The ID of the team in the Holdsport system. Get be obtained through the Holdsport API.
+        team_id (int): The ID of the team in the Holdsport system. Get it through the Holdsport API.
         date (str): The date of the practice in the format "YYYY-MM-DD".
         auth (tuple[str, str]): A tuple containing the username and password for the Holdsport API authentication.
 
@@ -51,7 +51,7 @@ def _get_activity_id(team_id: int, date: str, auth: tuple[str, str]) -> int | No
     """Return the activity ID of the "Motion A" practice on the given date.
 
     Args:
-        team_id (int): The ID of the team in the Holdsport system. Get be obtained through the Holdsport API.
+        team_id (int): The ID of the team in the Holdsport system. Get it through the Holdsport API.
         date (str): The date of the practice in the format "YYYY-MM-DD".
         auth (tuple[str, str]): A tuple containing the username and password for the Holdsport API authentication.
 

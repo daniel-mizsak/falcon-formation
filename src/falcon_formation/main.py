@@ -43,14 +43,10 @@ def falcon_formation() -> str:
 
     # Get players
     players, unknown_players, players_with_missing_data = get_players(team_data, registered_players)
-    # TODO: Add easy option to add extra players
 
     # Extra players
-    extra_players: list[Player] = [
-        # Player(name="name", skill=3, positions=("G",)),  # noqa: ERA001
-        Player(name="Rhys", skill=3, positions=()),
-        Player(name="Nicolaj", skill=3, positions=("G",)),
-    ]
+    extras_data_path = Path("data/extras.json")
+    extra_players = load_team_data(extras_data_path, team_name)
     players.extend(extra_players)
 
     # Randomly choose one of the best team combinations
