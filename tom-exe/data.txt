@@ -1,0 +1,6 @@
+TEAM_ID=100000
+DATE=2024-06-03
+ACTIVITY_NAME=Team Practice
+STATUS=Attending
+USERNAME=user-name
+PASSWORD=password
