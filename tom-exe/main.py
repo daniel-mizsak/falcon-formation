@@ -1,6 +1,7 @@
 import json
 import unicodedata
 from datetime import datetime
+import pandas as pd
 
 import requests
 
@@ -64,5 +65,9 @@ if __name__ == "__main__":
 
     for registered_player in registered_players:
         print(registered_player)
+
+    df = pd.DataFrame(registered_players, columns=["Name"])
+    df.to_excel(f"{date}_registered_players.xlsx", index=False)
+    print(f"\n\nData saved to {date}_registered_players.xlsx")
 
     input("\n\nPress enter to exit.")
