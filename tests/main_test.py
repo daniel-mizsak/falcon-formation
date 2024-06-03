@@ -23,6 +23,15 @@ def test_load_team_data() -> None:
     assert team_data[-1] == Player(name="Cody Center", skill=4, positions=("C", "RW"))
 
 
+def test_load_team_data_for_extras() -> None:
+    team_data_path = Path("data/extras.json")
+    team_name = "Motion A"
+
+    team_data = load_team_data(team_data_path, team_name)
+
+    assert isinstance(team_data, list)
+
+
 def test_save_team_data() -> None:
     team_data_path = Path("data/team_test.json")
     team_name = "Dream Team"

@@ -41,7 +41,7 @@ def get_registered_players(team_id: int, date: str, auth: tuple[str, str]) -> li
     registered_players = []
     for user in response_dict:
         if user["status"] == "Attending":
-            user_name = unicodedata.normalize("NFKD", user["name"]).replace("\xa0", " ")
+            user_name = unicodedata.normalize("NFKD", user["name"])
             registered_players.append(user_name)
 
     return sorted(registered_players)
