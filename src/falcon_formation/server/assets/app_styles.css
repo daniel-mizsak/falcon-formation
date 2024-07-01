@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    width: 80%;
+    margin: 0 auto;
+}
+
+.submit-button {
+    height: 50px;
+    width: 150px;
+    background-color: #007BFF;
+    color: #ffffff;
+    font-size: 20px;
+    border-radius: 5px;
+    border: 1px solid #007BFF;
+    padding: 5px 10px;
+    margin: 30px 0;
+}
+
+.submit-button:hover {
+    border: 1px solid #0056b3;
+    background-color: #0056b3;
+    color: #ffffff;
+    padding: 5px 10px;
+}
+
+.submit-button:disabled,
+.submit-button[disabled] {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #6c757d;
+}
+
+.player-input {
+    height: 30px;
+    width: 100%;
+    font-size: 15px;
+    margin: 10px 0;
+}

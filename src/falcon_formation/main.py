@@ -9,14 +9,12 @@ import os
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import requests
 from dotenv import dotenv_values
 
-from falcon_formation.create_teams import (
-    Player,
-    choose_best_team,
-    generate_output,
-    get_players,
-)
+from falcon_formation import STATUS_CODE_OK
+from falcon_formation.create_teams import choose_best_team, generate_output, get_players
+from falcon_formation.data_models import Player
 from falcon_formation.holdsport_api import get_registered_players
 
 
@@ -37,7 +35,7 @@ def falcon_formation() -> str:
     auth = (str(config["HOLDSPORT_USERNAME"]), str(config["HOLDSPORT_PASSWORD"]))
 
     # Load team data and query registered players
-    team_data_path = Path("data/team.json")
+    team_data_path = "data/team.json"
     team_data = load_team_data(team_data_path, team_name)
     registered_players = get_registered_players(team_id, date, auth)
 
@@ -45,7 +43,7 @@ def falcon_formation() -> str:
     players, unknown_players, players_with_missing_data = get_players(team_data, registered_players)
 
     # Extra players
-    extras_data_path = Path("data/extras.json")
+    extras_data_path = f"https://falcon-formation.pythonvilag.hu/extras/{date}"
     extra_players = load_team_data(extras_data_path, team_name)
     players.extend(extra_players)
 
@@ -56,18 +54,27 @@ def falcon_formation() -> str:
     return generate_output(date, best_team, players_with_missing_data, unknown_players)
 
 
-def load_team_data(team_data_path: Path, team_name: str) -> list[Player]:
+def load_team_data(team_data_path: str, team_name: str) -> list[Player]:
     """Load team data from a JSON file.
 
     Args:
-        team_data_path (Path): Path to the JSON file.
+        team_data_path (str): Path or URL to the JSON file.
         team_name (str): Name of the team within the JSON file. One JSON file may contain multiple teams.
 
     Returns:
         list[Player]: List of Player objects, where each element represents a player in the team.
     """
-    with team_data_path.open("r", encoding="utf-8") as file_handle:
-        json_data = json.load(file_handle)[team_name]
+    if team_data_path.startswith("http"):
+        try:
+            response = requests.get(url=team_data_path, timeout=10)
+            if response.status_code != STATUS_CODE_OK:
+                return []
+            json_data = json.loads(response.text)[team_name]
+        except requests.exceptions.ConnectionError:
+            return []
+    else:
+        with Path(team_data_path).open("r", encoding="utf-8") as file_handle:
+            json_data = json.load(file_handle)[team_name]
 
     team_data = []
     for player_name in json_data:
@@ -80,11 +87,11 @@ def load_team_data(team_data_path: Path, team_name: str) -> list[Player]:
     return team_data
 
 
-def save_team_data(team_data_path: Path, team_name: str, players: list[Player]) -> None:
+def save_team_data(team_data_path: str, team_name: str, players: list[Player]) -> None:
     """Save team data to a JSON file.
 
     Args:
-        team_data_path (Path): Path to the JSON file.
+        team_data_path (str): Path to the JSON file.
         team_name (str): Name of the team within the JSON file. One JSON file may contain multiple teams.
         players (List[Player]): List of Player objects, where each element represents a player in the team.
     """
@@ -92,5 +99,5 @@ def save_team_data(team_data_path: Path, team_name: str, players: list[Player]) 
     for player in players:
         team_data[player.name] = {"skill": player.skill, "positions": list(player.positions)}
 
-    with team_data_path.open("w", encoding="utf-8") as file_handle:
+    with Path(team_data_path).open("w", encoding="utf-8") as file_handle:
         json.dump({team_name: team_data}, file_handle, ensure_ascii=False, indent=2)
