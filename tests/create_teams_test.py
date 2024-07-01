@@ -8,9 +8,6 @@ import textwrap
 from math import factorial
 
 from falcon_formation.create_teams import (
-    Player,
-    TeamData,
-    TeamMetrics,
     _assign_me_to_team_red,
     _calculate_defense_number_difference,
     _calculate_goalie_number_difference,
@@ -21,6 +18,7 @@ from falcon_formation.create_teams import (
     generate_output,
     get_players,
 )
+from falcon_formation.data_models import Player, TeamData, TeamMetrics
 
 
 def test_player() -> None:
