@@ -7,41 +7,13 @@ Helper functions for creating equal hockey teams.
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
 from itertools import combinations
 from typing import TYPE_CHECKING
 
+from falcon_formation.data_models import Player, TeamData, TeamDistribution, TeamMetrics
+
 if TYPE_CHECKING:
     from collections.abc import Generator
-
-
-@dataclass(frozen=True)
-class Player:
-    """Data class for storing player data."""
-
-    name: str
-    skill: int
-    positions: tuple[str, ...]
-
-
-@dataclass(eq=True, order=True, frozen=True)
-class TeamMetrics:
-    """Data class for storing team metrics."""
-
-    goalie_number_difference: int
-    defense_number_difference: int
-    skill_difference: int
-
-
-type TeamDistribution = tuple[set[Player], set[Player]]  # type: ignore[valid-type]
-
-
-@dataclass(frozen=True)
-class TeamData:
-    """Data class for storing a team's members and metrics."""
-
-    teams: TeamDistribution
-    metrics: TeamMetrics
 
 
 def get_players(team_data: list[Player], registered_players: list[str]) -> tuple[list[Player], list[str], list[str]]:

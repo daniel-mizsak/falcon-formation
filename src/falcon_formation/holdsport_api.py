@@ -33,7 +33,7 @@ def get_registered_players(team_id: int, date: str, auth: tuple[str, str]) -> li
     url = f"https://api.holdsport.dk/v1/activities/{activity_id}/activities_users"
     headers = {"Accept": "application/json"}
 
-    response = requests.get(url, headers=headers, auth=auth, timeout=5)
+    response = requests.get(url, headers=headers, auth=auth, timeout=10)
     if response.status_code != STATUS_CODE_OK:
         return []
     response_dict = json.loads(response.text)
@@ -61,7 +61,7 @@ def _get_activity_id(team_id: int, date: str, auth: tuple[str, str]) -> int | No
     url = f"https://api.holdsport.dk/v1/teams/{team_id}/activities?date={date}"
     headers = {"Accept": "application/json"}
 
-    response = requests.get(url, headers=headers, auth=auth, timeout=5)
+    response = requests.get(url, headers=headers, auth=auth, timeout=10)
     if response.status_code != STATUS_CODE_OK:
         return None
     response_dict = json.loads(response.text)

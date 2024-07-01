@@ -4,7 +4,7 @@ Update skill level of individual players based on the outcome of the game.
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
-from falcon_formation.create_teams import Player
+from falcon_formation.data_models import Player
 
 
 def update_players_skill(team_data: list[Player], update_values: dict[str, int]) -> list[Player]:
