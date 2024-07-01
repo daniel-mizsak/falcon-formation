@@ -64,7 +64,7 @@ class Player:
         )
 
     @classmethod
-    def from_tuple(cls: Player, data: tuple[str, str, str]) -> Player:
+    def from_tuple(cls, data: tuple[str, str, str]) -> Player:  # noqa: ANN102, RUF100
         """Create a Player object from a tuple.
 
         Args:
