@@ -33,11 +33,12 @@ def falcon_formation() -> str:
     team_id = int(str(config["TEAM_ID"]))
     team_name = str(config["TEAM_NAME"])
     auth = (str(config["HOLDSPORT_USERNAME"]), str(config["HOLDSPORT_PASSWORD"]))
+    acvity_name = str(config["ACTIVITY_NAME"])
 
     # Load team data and query registered players
     team_data_path = "data/team.json"
     team_data = load_team_data(team_data_path, team_name)
-    registered_players = get_registered_players(team_id, date, auth)
+    registered_players = get_registered_players(team_id, date, auth, acvity_name)
 
     # Get players
     players, unknown_players, players_with_missing_data = get_players(team_data, registered_players)

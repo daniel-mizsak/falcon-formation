@@ -13,7 +13,7 @@ from flask import Flask, Response, send_file
 from falcon_formation.data_models import Player
 from falcon_formation.main import load_team_data, save_team_data
 
-team_name = "Motion A"
+team_name = "Motion A"  # TODO: Use team name from the main app.
 
 starting_date = datetime.date(2024, 7, 1)
 ending_date = datetime.date(2024, 7, 31)
