@@ -16,9 +16,9 @@ The program works by getting the registered players for the given day's practice
 
 Then the teams are generated so that:
 - The number of players in each team is as equal as possible
-- The sum of the skill levels in each team is as equal as possible
 - The number of goalkeepers in each team is as equal as possible
 - The number of defensive players in each team is as equal as possible
+- The sum of the skill levels in each team is as equal as possible
 
 If there are multiple possible solutions a team is randomly picked.
 Finally the teams are sent in a Telegram message to the coach. ([As holdsport does not support the chat functionality of an event.](https://github.com/Holdsport/holdsport-api/issues/20))

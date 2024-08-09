@@ -1,5 +1,5 @@
 """
-Short description and source of base code.
+Tests for the main module.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """

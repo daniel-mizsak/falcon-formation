@@ -1,5 +1,5 @@
 """
-Tests for the falcon_formation.create_teams module.
+Tests for the create teams module.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """

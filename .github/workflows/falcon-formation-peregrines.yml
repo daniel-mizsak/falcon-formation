@@ -1,0 +1,17 @@
+name: Falcon Formation Peregrines
+on:
+  # Run on cron job every Monday at (21:15 - 2) and every Wednesday at (20:00 - 2).
+  # schedule:
+  #  - cron: "15 19 * * 1"
+  #  - cron: "00 18 * * 3"
+  workflow_dispatch:
+
+jobs:
+  falcon-formation-peregrines:
+    uses: ./.github/workflows/falcon-formation-template.yml
+    with:
+      team_id: ${{ secrets.FALCONS_1_TEAM_ID }}
+      team_name: ${{ secrets.FALCONS_1_TEAM_NAME }}
+      activity_name: ${{ secrets.FALCONS_1_ACTIVITY_NAME }}
+      telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+    secrets: inherit

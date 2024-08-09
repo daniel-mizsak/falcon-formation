@@ -1,5 +1,5 @@
 """
-Tests for the falcon_formation.github_api module.
+Tests for the github api module.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """

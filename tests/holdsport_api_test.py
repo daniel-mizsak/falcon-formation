@@ -1,5 +1,5 @@
 """
-Tests for the falcon_formation.holdsport_api module.
+Tests for the holdsport api module.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
