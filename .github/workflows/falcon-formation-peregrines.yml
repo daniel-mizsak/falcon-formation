@@ -9,9 +9,13 @@ on:
 jobs:
   falcon-formation-peregrines:
     uses: ./.github/workflows/falcon-formation-template.yml
-    with:
+    secrets:
       team_id: ${{ secrets.FALCONS_1_TEAM_ID }}
       team_name: ${{ secrets.FALCONS_1_TEAM_NAME }}
       activity_name: ${{ secrets.FALCONS_1_ACTIVITY_NAME }}
-      telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
-    secrets: inherit
+      telegram_chat_id: ${{ secrets.FALCONS_1_TELEGRAM_CHAT_ID }}
+      encryption_key: ${{ secrets.FALCONS_1_ENCRYPTION_KEY }}
+
+      holdsport_username: ${{ secrets.HOLDSPORT_USERNAME }}
+      holdsport_password: ${{ secrets.HOLDSPORT_PASSWORD }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}

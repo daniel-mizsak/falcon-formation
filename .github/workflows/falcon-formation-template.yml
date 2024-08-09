@@ -1,19 +1,23 @@
 ---
 on:
   workflow_call:
-    inputs:
+    secrets:
       team_id:
         required: true
-        type: string
       team_name:
         required: true
-        type: string
       activity_name:
         required: true
-        type: string
       telegram_chat_id:
         required: true
-        type: string
+      encryption_key:
+        required: true
+
+      holdsport_username:
+        required: true
+      holdsport_password:
+        required: true
+      telegram_token:
 
 jobs:
   falcon-formation:
@@ -38,15 +42,15 @@ jobs:
       - name: Decrypt team data.
         run: >
           openssl enc -d -aes-256-cbc
-          -in data/team.json.enc
+          -in data/${{ secrets.team_name }}.json.enc
           -out data/team.json
-          -pass pass:${{ secrets.TEAM_ENCRYPTION_KEY }}
+          -pass pass:${{ secrets.encryption_key }}
           -pbkdf2
 
       - name: Run falcon formation.
         env:
-          TEAM_ID: ${{ inputs.team_id }}
-          TEAM_NAME: ${{ inputs.team_name }}
+          TEAM_ID: ${{ secrets.team_id }}
+          TEAM_NAME: ${{ secrets.team_name }}
           HOLDSPORT_USERNAME: ${{ secrets.holdsport_username }}
           HOLDSPORT_PASSWORD: ${{ secrets.holdsport_password }}
         run: |
@@ -72,6 +76,6 @@ jobs:
       - name: Send telegram message.
         uses: appleboy/telegram-action@master
         with:
-          to: ${{ inputs.telegram_chat_id }}
+          to: ${{ secrets.telegram_chat_id }}
           token: ${{ secrets.telegram_token }}
           message: ${{ env.MESSAGE }}
