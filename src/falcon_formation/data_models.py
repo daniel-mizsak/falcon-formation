@@ -7,7 +7,7 @@ Data classes for storing player data and team metrics.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import ClassVar
+from typing import ClassVar, TypeAlias
 
 
 @dataclass(frozen=True)
@@ -91,7 +91,8 @@ class TeamMetrics:
     skill_difference: int
 
 
-type TeamDistribution = tuple[set[Player], set[Player]]  # type: ignore[valid-type]
+# TODO: Use `type` keyword solution when dropping Python 3.11.
+TeamDistribution: TypeAlias = tuple[set[Player], set[Player]]  # noqa: UP040
 
 
 @dataclass(frozen=True)
