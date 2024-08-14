@@ -8,40 +8,53 @@ import datetime
 from pathlib import Path
 
 from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
-from flask import Flask, Response, send_file
+from dash.exceptions import PreventUpdate
+from flask import Flask, redirect, send_file
+from werkzeug import Response
 
 from falcon_formation.data_models import Player
-from falcon_formation.main import load_team_data, save_team_data
+from falcon_formation.holdsport_api import get_upcoming_practice_dates
+from falcon_formation.main import load_config, load_team_data, save_team_data
 
-team_name = "Motion A"  # TODO: Use team name from the main app.
-
-starting_date = datetime.date(2024, 7, 1)
-ending_date = datetime.date(2024, 7, 31)
-enabled_day_numbers = [0, 1, 2, 3]  # TODO: Change to the days of the week when the practice is held.
-
-disabled_days = [
-    starting_date + datetime.timedelta(days=day)
-    for day in range((ending_date - starting_date).days + 1)
-    if (starting_date + datetime.timedelta(days=day)).weekday() not in enabled_day_numbers
-]
-initial_date = (datetime.datetime.now(tz=datetime.UTC) + datetime.timedelta(hours=2)).date()
-while initial_date in disabled_days:
-    initial_date += datetime.timedelta(days=1)
-
+# Load configuration values
+config_path = ".env"
+available_teams = ["falcons_1"]
 
 server = Flask(__name__)
+
+
+@server.route("/")
+def home() -> str:
+    """Home page of the server."""
+    return "The app is working!"
+
+
+@server.route("/teams/<team>")
+def redirect_to_team(team: str) -> Response:
+    """Redirect to the team-specific dashboard.
+
+    Args:
+        team (str): Team name.
+
+    Returns:
+        Response: Redirect response to the team-specific dashboard.
+    """
+    if team not in available_teams:
+        return redirect("/")
+    return redirect(f"/dash/{team}")
+
+
 app = Dash(__name__, server=server, url_base_pathname="/dash/")
 app.layout = html.Div(
+    # TODO: Add loading screen from the initial page load.
     [
+        dcc.Location(id="url", refresh=True),
+        dcc.Store(id="redirect-flag", data=False),
         html.Label("Practice date:"),
         html.Br(),
         dcc.DatePickerSingle(
             id="practice-date-picker",
-            min_date_allowed=starting_date,
-            max_date_allowed=ending_date,
             first_day_of_week=1,
-            date=initial_date,
-            disabled_days=disabled_days,
         ),
         html.Br(),
         html.Br(),
@@ -93,6 +106,74 @@ app.layout = html.Div(
         ),
     ],
 )
+
+
+@app.callback(  # type: ignore[misc]
+    [
+        Output("url", "pathname"),
+        Output("redirect-flag", "data"),
+    ],
+    [
+        Input("url", "pathname"),
+    ],
+)
+def redirect_invalid_url(pathname: str) -> tuple[str, bool]:
+    """Redirect to the home page if the URL path is invalid."""
+    team_name = pathname.split("/")[-1]
+    if team_name not in available_teams:
+        return "/", True
+    return pathname, False
+
+
+@app.callback(  # type: ignore[misc]
+    [
+        Output("practice-date-picker", "min_date_allowed"),
+        Output("practice-date-picker", "max_date_allowed"),
+        Output("practice-date-picker", "date"),
+        Output("practice-date-picker", "disabled_days"),
+    ],
+    [
+        Input("redirect-flag", "data"),
+        Input("url", "pathname"),
+    ],
+)
+def update_date_picker(
+    redirect_flag: bool,  # noqa: FBT001
+    url_pathname: str,
+) -> tuple[
+    datetime.date,
+    datetime.date,
+    datetime.date,
+    list[datetime.date],
+]:
+    """Update the date picker based on the practice dates of the team.
+
+    Args:
+        redirect_flag (bool): Flag indicating if the URL path is invalid.
+        url_pathname (str): URL path containing the team name.
+
+    Returns:
+        tuple[datetime.date, datetime.date, datetime.date, list[datetime.date]]:
+        Tuple containing the minimum allowed date, maximum allowed date, initial date, and disabled days.
+    """
+    if redirect_flag:
+        raise PreventUpdate
+
+    team_name = url_pathname.split("/")[-1]
+    team_id, activity_name, auth = load_config(config_path, team_name)
+    upcoming_practice_dates = get_upcoming_practice_dates(team_id, auth, activity_name)
+
+    min_allowed_date = upcoming_practice_dates[0]
+    max_allowed_date = upcoming_practice_dates[-1]
+    initial_date = min_allowed_date
+
+    disabled_days = []
+    for i in range((max_allowed_date - min_allowed_date).days):
+        date = min_allowed_date + datetime.timedelta(days=i)
+        if date not in upcoming_practice_dates:
+            disabled_days.append(date)
+
+    return min_allowed_date, max_allowed_date, initial_date, disabled_days
 
 
 @app.callback(  # type: ignore[misc]
@@ -187,20 +268,24 @@ def update_submit_confirm_message(
         Output("player-positions-dropdown", "value"),
     ],
     [
+        Input("redirect-flag", "data"),
         Input("practice-date-picker", "date"),
         Input("player-data-table", "data"),
         Input("submit-confirm", "submit_n_clicks"),
     ],
     [
+        State("url", "pathname"),
         State("player-name-input", "value"),
         State("player-skill-dropdown", "value"),
         State("player-positions-dropdown", "value"),
     ],
 )
 def update_player_data_table(  # noqa: PLR0913
+    redirect_flag: bool,  # noqa: FBT001
     practice_date: datetime.date,
     data_table: list[dict[str, str]],
     confirm_n_clicks: int,
+    url_pathname: str,
     name: str,
     skill: int | None,
     positions: list[str],
@@ -208,9 +293,11 @@ def update_player_data_table(  # noqa: PLR0913
     """Update the player data table and corresponding JSON file.
 
     Args:
+        redirect_flag (bool): Flag indicating if the URL path is invalid
         practice_date (datetime.date): Selected date of the practice.
         data_table (list[dict[str, str]]): Data table containing the player data.
         confirm_n_clicks (int): Number of clicks on the confirmation button.
+        url_pathname (str): URL path containing the team name.
         name (str): Name of the player.
         skill (int): Skill level of the player.
         positions (list[str]): Positions played by the player.
@@ -218,12 +305,16 @@ def update_player_data_table(  # noqa: PLR0913
     Returns:
         tuple[list[dict[str, str]], str, list[str], int]: Updated data table and reset input values.
     """
-    extras_data_path = f"data/extras/{practice_date}.json"
+    if redirect_flag:
+        raise PreventUpdate
+
+    team_name = url_pathname.split("/")[-1]
+    extras_data_path = f"data/extras/{team_name.upper()}_{practice_date}.json"
     if not Path(extras_data_path).exists():
-        save_team_data(extras_data_path, team_name, [])
+        save_team_data(extras_data_path, [])
 
     if ctx.triggered_id != "player-data-table":
-        extra_players = load_team_data(extras_data_path, team_name)
+        extra_players = load_team_data(extras_data_path)
     else:
         extra_players = [Player.from_tuple(tuple(row.values())) for row in data_table]  # type: ignore[arg-type]
 
@@ -233,7 +324,7 @@ def update_player_data_table(  # noqa: PLR0913
         positions = []
         skill = None
 
-    save_team_data(extras_data_path, team_name, extra_players)
+    save_team_data(extras_data_path, extra_players)
     data_table_values = [player.to_tuple() for player in extra_players]
     data_table = [
         {"name": name, "skill": skill, "positions": positions} for name, skill, positions in data_table_values
@@ -241,17 +332,18 @@ def update_player_data_table(  # noqa: PLR0913
     return data_table, name, skill, positions
 
 
-@server.route("/extras/<date>")
-def serve_json(date: str) -> Response:
-    """Serve the JSON file containing the extra players for the given date.
+@server.route("/extras/<team_name>/<practice_date>")
+def serve_json(team_name: str, practice_date: str) -> Response:
+    """Serve the JSON file containing the extra players for the given team and practice date.
 
     Args:
-        date (str): Date of the practice.
+        team_name (str): Name of the team.
+        practice_date (str): Date of the practice in the format "YYYY-MM-DD".
 
     Returns:
         Response: JSON file containing the extra players for the given date.
     """
-    file_path = Path(f"data/extras/{date}.json").resolve()
+    file_path = Path(f"data/extras/{team_name.upper()}_{practice_date}.json").resolve()
     return send_file(file_path, mimetype="application/json")
 
 

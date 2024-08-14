@@ -6,9 +6,9 @@ https://github.com/Holdsport/holdsport-api
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
+import datetime
 import json
 import unicodedata
-from datetime import datetime
 
 import requests
 
@@ -69,11 +69,38 @@ def _get_activity_id(team_id: int, date: str, auth: tuple[str, str], activity_na
     response_dict = json.loads(response.text)
 
     for response_entry in response_dict:
-        start_time = str(datetime.strptime(response_entry["starttime"], "%Y-%m-%dT%H:%M:%S%z").date())
+        start_time = str(datetime.datetime.strptime(response_entry["starttime"], "%Y-%m-%dT%H:%M:%S%z").date())
 
         if (response_entry["name"] == activity_name) and (date == start_time) and (response_entry["id"]):
             return int(response_entry["id"])
     return None
+
+
+def get_upcoming_practice_dates(team_id: int, auth: tuple[str, str], activity_name: str) -> list[datetime.date]:
+    """Return the list of upcoming practice dates for the team.
+
+    Args:
+        team_id (int): The ID of the team in the Holdsport system. Get it through _get_list_of_teams.
+        auth (tuple[str, str]): A tuple containing the username and password for the Holdsport API authentication.
+        activity_name (str): The name of the practice in the Holdsport system.
+
+    Returns:
+        list[date]: The list of upcoming practice dates.
+    """
+    url = f"https://api.holdsport.dk/v1/teams/{team_id}/activities?per_page=6"
+    headers = {"Accept": "application/json"}
+
+    response = requests.get(url, headers=headers, auth=auth, timeout=10)
+    if response.status_code != STATUS_CODE_OK:
+        return []
+    response_dict = json.loads(response.text)
+
+    practice_dates = []
+    for response_entry in response_dict:
+        if response_entry["name"] == activity_name:
+            start_time = datetime.datetime.strptime(response_entry["starttime"], "%Y-%m-%dT%H:%M:%S%z")
+            practice_dates.append(start_time.date())
+    return sorted(practice_dates)
 
 
 def _get_list_of_teams(auth: tuple[str, str]) -> list[dict[str, str]]:
