@@ -305,7 +305,7 @@ def update_player_data_table(  # noqa: PLR0913
     Returns:
         tuple[list[dict[str, str]], str, list[str], int]: Updated data table and reset input values.
     """
-    if redirect_flag:
+    if redirect_flag or not practice_date:
         raise PreventUpdate
 
     team_name = url_pathname.split("/")[-1]

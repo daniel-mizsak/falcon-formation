@@ -68,10 +68,10 @@ def load_config(config_path: str, team_name: str) -> tuple[int, str, tuple[str, 
         tuple[int, str, tuple[str, str]]: Team ID, activity name, and authentication data.
     """
     config = dotenv_values(config_path)
+    team_prefix = team_name.upper() + "_"
     if not config:
         config = dict(os.environ)
-
-    team_prefix = team_name.upper() + "_"
+        team_prefix = ""
 
     team_id = int(str(config[team_prefix + "TEAM_ID"]))
     activity_name = str(config[team_prefix + "ACTIVITY_NAME"])

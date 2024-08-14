@@ -53,8 +53,8 @@ jobs:
 
       - name: Run falcon formation.
         env:
-          TEAM_NAME: ${{ inputs.team_name }}
           TEAM_ID: ${{ secrets.team_id }}
+          ACTIVITY_NAME: ${{ secrets.activity_name }}
           HOLDSPORT_USERNAME: ${{ secrets.holdsport_username }}
           HOLDSPORT_PASSWORD: ${{ secrets.holdsport_password }}
         run: |
