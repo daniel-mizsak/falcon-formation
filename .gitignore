@@ -1,6 +1,5 @@
 # Project
-data/extras/
-data/team.json
+data/**/*.json
 encrypt.sh
 encryption.key
 

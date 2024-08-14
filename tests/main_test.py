@@ -12,9 +12,8 @@ from falcon_formation.main import load_team_data, save_team_data
 
 def test_load_team_data() -> None:
     team_data_path = "data/team_example.json"
-    team_name = "Dream Team"
 
-    team_data = load_team_data(team_data_path, team_name)
+    team_data = load_team_data(team_data_path)
 
     assert isinstance(team_data, list)
     assert len(team_data) == 15
@@ -25,7 +24,6 @@ def test_load_team_data() -> None:
 
 def test_save_team_data() -> None:
     team_data_path = "data/team_test.json"
-    team_name = "Dream Team"
 
     team_data = [
         Player(name="George Goalie", skill=3, positions=tuple("G")),
@@ -33,9 +31,9 @@ def test_save_team_data() -> None:
         Player(name="Cody Center", skill=4, positions=("C", "RW")),
     ]
 
-    save_team_data(team_data_path, team_name, team_data)
+    save_team_data(team_data_path, team_data)
 
-    team_data = load_team_data(team_data_path, team_name)
+    team_data = load_team_data(team_data_path)
 
     assert isinstance(team_data, list)
     assert len(team_data) == 3

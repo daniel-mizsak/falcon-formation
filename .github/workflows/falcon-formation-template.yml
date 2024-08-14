@@ -1,10 +1,14 @@
 ---
 on:
   workflow_call:
+    inputs:
+      team_name:
+        description: "The name of the team."
+        type: string
+        required: true
+
     secrets:
       team_id:
-        required: true
-      team_name:
         required: true
       activity_name:
         required: true
@@ -42,7 +46,7 @@ jobs:
       - name: Decrypt team data.
         run: >
           openssl enc -d -aes-256-cbc
-          -in data/${{ secrets.team_name }}.json.enc
+          -in data/${{ inputs.team_name }}.json.enc
           -out data/team.json
           -pass pass:${{ secrets.encryption_key }}
           -pbkdf2
@@ -50,13 +54,13 @@ jobs:
       - name: Run falcon formation.
         env:
           TEAM_ID: ${{ secrets.team_id }}
-          TEAM_NAME: ${{ secrets.team_name }}
+          ACTIVITY_NAME: ${{ secrets.activity_name }}
           HOLDSPORT_USERNAME: ${{ secrets.holdsport_username }}
           HOLDSPORT_PASSWORD: ${{ secrets.holdsport_password }}
         run: |
           {
             echo 'MESSAGE<<EOF'
-            falcon-formation
+            falcon-formation ${{ inputs.team_name }}
             echo EOF
           } >> "$GITHUB_ENV"
 
