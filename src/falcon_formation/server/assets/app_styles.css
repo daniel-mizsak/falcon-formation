@@ -7,6 +7,18 @@ body {
     margin: 0 auto;
 }
 
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 40px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+}
+
 .submit-button {
     height: 50px;
     width: 150px;

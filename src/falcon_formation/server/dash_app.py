@@ -46,10 +46,17 @@ def redirect_to_team(team: str) -> Response:
 
 app = Dash(__name__, server=server, url_base_pathname="/dash/")
 app.layout = html.Div(
-    # TODO: Add loading screen from the initial page load.
     [
         dcc.Location(id="url", refresh=True),
         dcc.Store(id="redirect-flag", data=False),
+        dcc.Loading(
+            id="loading",
+            className="loading",
+            type="default",
+            children=[
+                html.Div(id="loading-output"),
+            ],
+        ),
         html.Label("Practice date:"),
         html.Br(),
         dcc.DatePickerSingle(
@@ -127,6 +134,7 @@ def redirect_invalid_url(pathname: str) -> tuple[str, bool]:
 
 @app.callback(  # type: ignore[misc]
     [
+        Output("loading-output", "children"),
         Output("practice-date-picker", "min_date_allowed"),
         Output("practice-date-picker", "max_date_allowed"),
         Output("practice-date-picker", "date"),
@@ -141,6 +149,7 @@ def update_date_picker(
     redirect_flag: bool,  # noqa: FBT001
     url_pathname: str,
 ) -> tuple[
+    None,
     datetime.date,
     datetime.date,
     datetime.date,
@@ -153,8 +162,8 @@ def update_date_picker(
         url_pathname (str): URL path containing the team name.
 
     Returns:
-        tuple[datetime.date, datetime.date, datetime.date, list[datetime.date]]:
-        Tuple containing the minimum allowed date, maximum allowed date, initial date, and disabled days.
+        tuple[None, datetime.date, datetime.date, datetime.date, list[datetime.date]]:
+        Tuple containing loading, minimum allowed date, maximum allowed date, initial date, and disabled days.
     """
     if redirect_flag:
         raise PreventUpdate
@@ -173,7 +182,7 @@ def update_date_picker(
         if date not in upcoming_practice_dates:
             disabled_days.append(date)
 
-    return min_allowed_date, max_allowed_date, initial_date, disabled_days
+    return None, min_allowed_date, max_allowed_date, initial_date, disabled_days
 
 
 @app.callback(  # type: ignore[misc]
