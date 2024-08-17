@@ -76,18 +76,25 @@ def _get_activity_id(team_id: int, date: str, auth: tuple[str, str], activity_na
     return None
 
 
-def get_upcoming_practice_dates(team_id: int, auth: tuple[str, str], activity_name: str) -> list[datetime.date]:
+def get_upcoming_practice_dates(
+    team_id: int,
+    auth: tuple[str, str],
+    activity_name: str,
+    total_activity_number: int = 6,
+) -> list[datetime.date]:
     """Return the list of upcoming practice dates for the team.
 
     Args:
         team_id (int): The ID of the team in the Holdsport system. Get it through _get_list_of_teams.
         auth (tuple[str, str]): A tuple containing the username and password for the Holdsport API authentication.
         activity_name (str): The name of the practice in the Holdsport system.
+        total_activity_number (int): The number of upcoming activities to return. Defaults to 6.
+        Keep in mind that these are all the activities, not just the activity speicified by activity_name.
 
     Returns:
         list[date]: The list of upcoming practice dates.
     """
-    url = f"https://api.holdsport.dk/v1/teams/{team_id}/activities?per_page=6"
+    url = f"https://api.holdsport.dk/v1/teams/{team_id}/activities?per_page={total_activity_number}"
     headers = {"Accept": "application/json"}
 
     response = requests.get(url, headers=headers, auth=auth, timeout=10)

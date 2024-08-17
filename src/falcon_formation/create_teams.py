@@ -87,11 +87,11 @@ def _generate_every_team_combination(players: list[Player]) -> Generator[TeamDis
 
 
 def _calculate_team_metrics(teams: TeamDistribution) -> TeamMetrics:
-    return TeamMetrics(
-        goalie_number_difference=_calculate_goalie_number_difference(teams),
-        defense_number_difference=_calculate_defense_number_difference(teams),
-        skill_difference=_calculate_skill_level_difference(teams),
-    )
+    goalie_number_difference = _calculate_goalie_number_difference(teams)
+    defense_number_difference = _calculate_defense_number_difference(teams)
+    skill_difference = _calculate_skill_level_difference(teams, goalie_number_difference)
+
+    return TeamMetrics(goalie_number_difference, defense_number_difference, skill_difference)
 
 
 def _calculate_goalie_number_difference(teams: TeamDistribution) -> int:
@@ -118,11 +118,13 @@ def _calculate_defense_number_difference(teams: TeamDistribution) -> int:
     return abs(total_defense_numbers[0] - total_defense_numbers[1])
 
 
-def _calculate_skill_level_difference(teams: TeamDistribution) -> int:
+def _calculate_skill_level_difference(teams: TeamDistribution, goalie_number_difference: int) -> int:
     total_team_skills = []
     for team in teams:
         total_team_skill = 0
         for player in team:
+            if "G" in player.positions and goalie_number_difference != 0:
+                continue
             total_team_skill += player.skill
         total_team_skills.append(total_team_skill)
 

@@ -160,7 +160,7 @@ def test_calculate_team_metrics(team_data: list[Player]) -> None:
 
         goalie_number_difference = _calculate_goalie_number_difference(teams)
         defense_number_difference = _calculate_defense_number_difference(teams)
-        skill_level_difference = _calculate_skill_level_difference(teams)
+        skill_level_difference = _calculate_skill_level_difference(teams, goalie_number_difference)
 
         assert isinstance(team_metrics, TeamMetrics)
         assert team_metrics.goalie_number_difference == goalie_number_difference
@@ -192,9 +192,15 @@ def test_calculate_defense_number_difference(team_data: list[Player]) -> None:
 
 def test_calculate_skill_level_difference(team_data: list[Player]) -> None:
     for teams in _generate_every_team_combination(team_data):
-        skill_level_difference = _calculate_skill_level_difference(teams)
+        goalie_number_difference = _calculate_goalie_number_difference(teams)
+        skill_level_difference = _calculate_skill_level_difference(teams, goalie_number_difference)
 
         team_1, team_2 = teams
+        # TODO: Have more tests to make sure goalie skill is only added to the team if both teams have a goalie.
+        if goalie_number_difference != 0:
+            team_1 = {player for player in team_1 if "G" not in player.positions}
+            team_2 = {player for player in team_2 if "G" not in player.positions}
+
         skill_level_team_1 = sum([player.skill for player in team_1])
         skill_level_team_2 = sum([player.skill for player in team_2])
 
