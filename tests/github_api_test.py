@@ -8,6 +8,7 @@ import io
 import zipfile
 
 import requests_mock
+
 from falcon_formation.github_api import _get_latest_artifact, get_artifact_data
 
 

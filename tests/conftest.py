@@ -1,10 +1,11 @@
 """
-Short description and source of base code.
+Conftest module for pytest fixtures.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
 import pytest
+
 from falcon_formation.data_models import Player
 from falcon_formation.main import load_team_data
 

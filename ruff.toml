@@ -1,6 +1,7 @@
 # Exclude a variety of commonly ignored directories.
 # exclude = [""]
 
+src = ["src", "tests"]
 line-length = 120
 indent-width = 4
 
@@ -26,6 +27,7 @@ target-version = "py312"
       "ANN201",  # missing-return-type-undocumented-public-function
       "D",       # pydocstyle
       "PLR2004", # magic-value-comparison
+      "PT001",   # pytest-fixture-incorrect-parentheses-style
       "S101",    # assert
     ]
   [lint.pydocstyle]

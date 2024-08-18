@@ -38,6 +38,10 @@
     Repository = "https://github.com/daniel-mizsak/falcon-formation"
 
 # Tools
+# Hatch
+[tool.hatch.build.targets.wheel]
+  packages = ["src/falcon_formation"]
+
 # MyPy
 [tool.mypy]
   ignore_missing_imports = true

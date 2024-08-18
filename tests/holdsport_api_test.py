@@ -5,6 +5,7 @@ Tests for the holdsport api module.
 """
 
 import requests_mock
+
 from falcon_formation.holdsport_api import (
     _get_activity_id,
     _get_list_of_team_members,
