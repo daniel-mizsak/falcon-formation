@@ -1,9 +1,9 @@
 name: Falcon Formation Peregrines
 on:
   # Run on cron job every Monday at (21:15 - 2) and every Wednesday at (20:00 - 2).
-  # schedule:
-  #  - cron: "15 19 * * 1"
-  #  - cron: "00 18 * * 3"
+  schedule:
+   - cron: "15 19 * * 1"
+   - cron: "00 18 * * 3"
   workflow_dispatch:
 
 jobs:

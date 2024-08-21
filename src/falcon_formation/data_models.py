@@ -48,7 +48,7 @@ class Player:
             msg = f"Invalid skill level: {self.skill}"
             raise ValueError(msg)
         if any(position not in self.POSITION_OPTIONS for position in self.positions):
-            msg = f"Invalid position: {self.positions}"
+            msg = f"Invalid position: {self.positions} for player: {self.name}"
             raise ValueError(msg)
 
     def to_tuple(self: Player) -> tuple[str, str, str]:

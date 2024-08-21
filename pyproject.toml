@@ -19,7 +19,13 @@
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
   ]
-  dependencies = ["dash", "python-dotenv", "requests", "types-requests"]
+  dependencies = [
+    "dash",
+    "pandas",
+    "python-dotenv",
+    "requests",
+    "types-requests",
+  ]
   [project.optional-dependencies]
     dev = [
       "mypy",

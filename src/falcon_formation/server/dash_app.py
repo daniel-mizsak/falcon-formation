@@ -13,8 +13,8 @@ from flask import Flask, redirect, send_file
 from werkzeug import Response
 
 from falcon_formation.data_models import Player
+from falcon_formation.data_operations import load_config, load_team_data, save_team_data
 from falcon_formation.holdsport_api import get_upcoming_practice_dates
-from falcon_formation.main import load_config, load_team_data, save_team_data
 
 # Load configuration values
 config_path = ".env"

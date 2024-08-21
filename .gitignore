@@ -1,7 +1,7 @@
 # Project
+data/**/*.csv
 data/**/*.json
 encrypt.sh
-encryption.key
 
 # System
 .DS_Store
