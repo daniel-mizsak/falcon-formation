@@ -22,7 +22,7 @@ def falcon_formation(team_name: str) -> str:
     """
     # Load configuration values
     config_path = ".env"
-    team_id, activity_name, auth = load_config(config_path, team_name)
+    team_id, activity_name, auth, _ = load_config(config_path, team_name)
     date = str((datetime.now(tz=UTC) + timedelta(hours=2)).date())
 
     # Load team data and query registered players

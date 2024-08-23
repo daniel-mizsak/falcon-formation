@@ -24,7 +24,8 @@ def load_config(config_path: str, team_name: str) -> tuple[int, str, tuple[str, 
         team_name (str): Prefix of the team-specific configuration values.
 
     Returns:
-        tuple[int, str, tuple[str, str]]: Team ID, activity name, and authentication data.
+        tuple[int, str, tuple[str, str], str]:
+        TEAM_ID, ACTIVITY_NAME, (HOLDSPORT_USERNAME, HOLDSPORT_PASSWORD), ENCRYPTION_KEY
     """
     config = dotenv_values(config_path)
     team_prefix = team_name.upper() + "_"
@@ -35,8 +36,9 @@ def load_config(config_path: str, team_name: str) -> tuple[int, str, tuple[str, 
     team_id = int(str(config[team_prefix + "TEAM_ID"]))
     activity_name = str(config[team_prefix + "ACTIVITY_NAME"])
     auth = (str(config["HOLDSPORT_USERNAME"]), str(config["HOLDSPORT_PASSWORD"]))
+    encryption_key = str(config[team_prefix + "ENCRYPTION_KEY"])
 
-    return team_id, activity_name, auth
+    return team_id, activity_name, auth, encryption_key
 
 
 def load_team_data(team_data_path: str) -> list[Player]:

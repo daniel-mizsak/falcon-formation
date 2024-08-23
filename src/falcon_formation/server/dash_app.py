@@ -169,7 +169,7 @@ def update_date_picker(
         raise PreventUpdate
 
     team_name = url_pathname.split("/")[-1]
-    team_id, activity_name, auth = load_config(config_path, team_name)
+    team_id, activity_name, auth, _ = load_config(config_path, team_name)
     upcoming_practice_dates = get_upcoming_practice_dates(team_id, auth, activity_name)
 
     min_allowed_date = upcoming_practice_dates[0]
