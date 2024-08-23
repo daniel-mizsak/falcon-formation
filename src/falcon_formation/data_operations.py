@@ -16,7 +16,7 @@ from falcon_formation import STATUS_CODE_OK
 from falcon_formation.data_models import Player
 
 
-def load_config(config_path: str, team_name: str) -> tuple[int, str, tuple[str, str]]:
+def load_config(config_path: str, team_name: str) -> tuple[int, str, tuple[str, str], str]:
     """Load configuration values from a .env file or environment variables.
 
     Args:
