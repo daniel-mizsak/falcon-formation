@@ -57,6 +57,7 @@ jobs:
           ACTIVITY_NAME: ${{ secrets.activity_name }}
           HOLDSPORT_USERNAME: ${{ secrets.holdsport_username }}
           HOLDSPORT_PASSWORD: ${{ secrets.holdsport_password }}
+          ENCRYPTION_KEY: ${{ secrets.encryption_key }}
         run: |
           {
             echo 'MESSAGE<<EOF'
