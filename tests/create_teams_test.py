@@ -231,11 +231,11 @@ def test_generate_output() -> None:
     assert output == textwrap.dedent("""\
                                      Date: 2024-01-01
 
-                                     Team Red: (2)
+                                     Team 1: (2)
                                      Daniel Mizsak
                                      George Goalie
 
-                                     Team Not Fucking Green: (2)
+                                     Team 2: (2)
                                      David Defender
                                      Gustavo Goalie
 

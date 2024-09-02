@@ -150,10 +150,8 @@ def generate_output(
     """
     team_red, team_green = _assign_me_to_team_red(best_team.teams, "Daniel Mizsak")
     output = f"Date: {date}\n\n"
-    output += f"Team Red: ({len(team_red)})\n" + "\n".join([player.name for player in team_red]) + "\n\n"
-    output += (
-        f"Team Not Fucking Green: ({len(team_green)})\n" + "\n".join([player.name for player in team_green]) + "\n\n"
-    )
+    output += f"Team 1: ({len(team_red)})\n" + "\n".join([player.name for player in team_red]) + "\n\n"
+    output += f"Team 2: ({len(team_green)})\n" + "\n".join([player.name for player in team_green]) + "\n\n"
     output += f"Players with missing data: {', '.join(players_with_missing_data)}\n"
     output += f"Unknown players: {', '.join(unknown_players)}\n\n"
     output += f"Skill difference: {best_team.metrics.skill_difference}\n"
