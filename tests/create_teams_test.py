@@ -235,7 +235,7 @@ def test_generate_output() -> None:
                                      Daniel Mizsak
                                      George Goalie
 
-                                     Team Green: (2)
+                                     Team Not Fucking Green: (2)
                                      David Defender
                                      Gustavo Goalie
 
