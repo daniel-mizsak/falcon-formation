@@ -1,5 +1,5 @@
 """
-Helper functions for creating equal hockey teams.
+Helper functions for creating hockey teams.
 
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
@@ -10,6 +10,7 @@ import random
 from itertools import combinations
 from typing import TYPE_CHECKING
 
+from falcon_formation import GOALIE_RETURN_DICTIONARY
 from falcon_formation.data_models import Player, TeamData, TeamDistribution, TeamMetrics
 
 if TYPE_CHECKING:
@@ -71,6 +72,7 @@ def choose_best_team(players: list[Player]) -> TeamData:
         elif team_metrics < best_team_metrics:
             best_team_metrics = team_metrics
             best_teams = [TeamData(teams, team_metrics)]
+            continue
 
         if len(best_teams) >= maximum_number_of_teams:
             break  # pragma: no cover
@@ -134,35 +136,63 @@ def _calculate_skill_level_difference(teams: TeamDistribution, goalie_number_dif
 def generate_output(
     date: str,
     best_team: TeamData,
+    jersey_colors: tuple[str, str],
     players_with_missing_data: list[str],
     unknown_players: list[str],
-) -> str:
+) -> tuple[str, str]:
     """Generate the output string containing all the necessary information about the teams.
 
     Args:
         date (str): The date of the practice.
         best_team (Team): The best team distribution and its corresponding metrics.
+        jersey_colors (tuple[str, str]): The colors of the jerseys for the two teams.
         players_with_missing_data (list[str]): Players missing from team_data.
         unknown_players (list[str]): Players with incomplete information in team_data.
 
     Returns:
-        str: All the necessary information about the teams.
+        tuple[str]: The generated teams and their corresponding metadata in a nicely formatted way.
     """
-    team_red, team_green = _assign_me_to_team_red(best_team.teams, "Daniel Mizsak")
-    output = f"Date: {date}\n\n"
-    output += f"Team 1: ({len(team_red)})\n" + "\n".join([player.name for player in team_red]) + "\n\n"
-    output += f"Team 2: ({len(team_green)})\n" + "\n".join([player.name for player in team_green]) + "\n\n"
-    output += f"Players with missing data: {', '.join(players_with_missing_data)}\n"
-    output += f"Unknown players: {', '.join(unknown_players)}\n\n"
-    output += f"Skill difference: {best_team.metrics.skill_difference}\n"
-    output += f"Goalie number difference: {best_team.metrics.goalie_number_difference}\n"
-    output += f"Defense number difference: {best_team.metrics.defense_number_difference}\n\n"
+    team_one, team_two = _assign_me_to_team_one(best_team.teams, "Daniel Mizsak")
 
-    return output
+    output = ""
+    output += f"Team {jersey_colors[0]}: ({len(team_one)})\n"
+    output += "\n".join([player.name for player in team_one]) + "\n\n"
+
+    output += f"Team {jersey_colors[1]}: ({len(team_two)})\n"
+    output += "\n".join([player.name for player in team_two])
+
+    output_metadata = f"Date: {date}\n"
+    output_metadata += f"Players with missing data: {', '.join(players_with_missing_data)}\n"
+    output_metadata += f"Unknown players: {', '.join(unknown_players)}\n\n"
+    output_metadata += f"Skill difference: {best_team.metrics.skill_difference}\n"
+    output_metadata += f"Goalie number difference: {best_team.metrics.goalie_number_difference}\n"
+    output_metadata += f"Defense number difference: {best_team.metrics.defense_number_difference}"
+
+    return output, output_metadata
 
 
-def _assign_me_to_team_red(teams: TeamDistribution, my_name: str) -> tuple[list[Player], list[Player]]:
-    i_am_in_team_zero = any(player.name == my_name for player in teams[0])
-    team_red = sorted(teams[0] if i_am_in_team_zero else teams[1], key=lambda player: player.name)
-    team_green = sorted(teams[1] if i_am_in_team_zero else teams[0], key=lambda player: player.name)
-    return team_red, team_green
+def _assign_me_to_team_one(teams: TeamDistribution, my_name: str) -> tuple[list[Player], list[Player]]:
+    i_am_in_team_one = any(player.name == my_name for player in teams[0])
+    team_one = sorted(teams[0] if i_am_in_team_one else teams[1], key=lambda player: player.name)
+    team_two = sorted(teams[1] if i_am_in_team_one else teams[0], key=lambda player: player.name)
+    return team_one, team_two
+
+
+def generate_output_goalie(players: list[Player]) -> str:
+    """Generate the output string when only checking for goalies.
+
+    Args:
+        players (list[Player]): Players to generate teams from.
+
+    Returns:
+        str: The output message about the goalie number.
+    """
+    goalie_count = 0
+    for player in players:
+        if "G" in player.positions:
+            goalie_count += 1
+
+    return GOALIE_RETURN_DICTIONARY.get(
+        goalie_count,
+        "Ok, it looks like more than 2 goalies registered for today's practice. I guess we will make it work somehow.",
+    )

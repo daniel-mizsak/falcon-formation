@@ -6,6 +6,11 @@ on:
         description: "The name of the team."
         type: string
         required: true
+      goalie:
+        description: "Whether to run falcon-formation in goalie mode."
+        type: boolean
+        required: false
+        default: false
 
     secrets:
       team_id:
@@ -27,23 +32,23 @@ jobs:
   falcon-formation:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the codebase.
+      - name: Check out the codebase
         uses: actions/checkout@v4
 
-      - name: Set up python.
+      - name: Set up python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Upgrade pip.
+      - name: Upgrade pip
         run: >
           python -m pip install --upgrade pip
 
-      - name: Install package locally.
+      - name: Install package locally
         run: >
           pip install .
 
-      - name: Decrypt team data.
+      - name: Decrypt team data
         run: >
           openssl enc -d -aes-256-cbc
           -in data/${{ inputs.team_name }}.json.enc
@@ -51,7 +56,7 @@ jobs:
           -pass pass:${{ secrets.encryption_key }}
           -pbkdf2
 
-      - name: Run falcon formation.
+      - name: Run falcon formation
         env:
           TEAM_ID: ${{ secrets.team_id }}
           ACTIVITY_NAME: ${{ secrets.activity_name }}
@@ -61,26 +66,40 @@ jobs:
         run: |
           {
             echo 'MESSAGE<<EOF'
-            falcon-formation ${{ inputs.team_name }}
+            falcon-formation ${{ inputs.team_name }} ${{ inputs.goalie && ' --goalie' || '' }}
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - name: Save message as file.
+      - name: Save message as file
         run: |
             cat <<EOF > falcon-formation.txt
             ${{ env.MESSAGE }}
             EOF
 
-      - name: Save message file as artifact.
+      - name: Separate message into output and metadata
+        run: |
+          IFS='---' read -r OUTPUT METADATA <<< "${{ env.MESSAGE }}"
+          echo "OUTPUT=$OUTPUT" >> "$GITHUB_ENV"
+          echo "METADATA=$METADATA" >> "$GITHUB_ENV"
+
+      - name: Save message file as artifact
         uses: actions/upload-artifact@v4
         with:
           name: falcon-formation
           path: falcon-formation.txt
           retention-days: 5
 
-      - name: Send telegram message.
+      - name: Send output on Telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.telegram_chat_id }}
           token: ${{ secrets.telegram_token }}
-          message: ${{ env.MESSAGE }}
+          message: ${{ env.OUTPUT }}
+
+      - name: Send metadata on Telegram
+        uses: appleboy/telegram-action@master
+        if : ${{ env.METADATA }}
+        with:
+          to: ${{ secrets.telegram_chat_id }}
+          token: ${{ secrets.telegram_token }}
+          message: ${{ env.METADATA }}

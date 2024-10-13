@@ -89,7 +89,7 @@ def get_upcoming_practice_dates(
         auth (tuple[str, str]): A tuple containing the username and password for the Holdsport API authentication.
         activity_name (str): The name of the practice in the Holdsport system.
         total_activity_number (int): The number of upcoming activities to return. Defaults to 6.
-        Keep in mind that these are all the activities, not just the activity speicified by activity_name.
+        Keep in mind that these are all the activities, not just the activity specified by activity_name.
 
     Returns:
         list[date]: The list of upcoming practice dates.

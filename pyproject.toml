@@ -6,7 +6,7 @@
 # Project Metadata
 [project]
   name = "falcon-formation"
-  version = "0.0.3"
+  version = "0.1.0"
   description = "Create evenly distributed hockey teams."
   readme = "README.md"
   requires-python = ">=3.11"
@@ -66,4 +66,11 @@
 # Coverage
 [tool.coverage.report]
   exclude_also = ["if TYPE_CHECKING:", "if __name__ == '__main__':"]
-  omit = ["**/__main__.py"]
+  omit = [
+    "__init__.py",
+    "__main__.py",
+    "tests/*",
+    "cli.py",
+    "main.py",
+    "**/falcon_formation/server/*",
+  ]

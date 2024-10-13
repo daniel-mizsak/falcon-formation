@@ -6,19 +6,21 @@ Main module of the Falcon Formation application.
 
 from datetime import UTC, datetime, timedelta
 
-from falcon_formation.create_teams import choose_best_team, generate_output, get_players
+from falcon_formation import JERSEY_COLORS
+from falcon_formation.create_teams import choose_best_team, generate_output, generate_output_goalie, get_players
 from falcon_formation.data_operations import load_config, load_team_data
 from falcon_formation.holdsport_api import get_registered_players
 
 
-def falcon_formation(team_name: str) -> str:
+def falcon_formation(team_name: str, goalie: bool = False) -> tuple[str, str]:  # noqa: FBT001, FBT002
     """Run Falcon Formation.
 
     Args:
         team_name (str): Name of the team.
+        goalie (bool): Whether to only check for goalies. Defaults to False.
 
     Returns:
-        str: The output text containing all the relevant information about the generated teams.
+        str: The output text containing all the relevant information about the generated teams and their metadata.
     """
     # Load configuration values
     config_path = ".env"
@@ -38,8 +40,12 @@ def falcon_formation(team_name: str) -> str:
     extra_players = load_team_data(extras_data_path)
     players.extend(extra_players)
 
+    # Generate goalie output if specified
+    if goalie:
+        return generate_output_goalie(players), ""
+
     # Randomly choose one of the best team combinations
     best_team = choose_best_team(players)
 
     # Create output
-    return generate_output(date, best_team, players_with_missing_data, unknown_players)
+    return generate_output(date, best_team, JERSEY_COLORS[team_name], players_with_missing_data, unknown_players)
