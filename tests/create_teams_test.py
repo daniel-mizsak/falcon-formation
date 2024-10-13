@@ -8,7 +8,7 @@ import textwrap
 from math import factorial
 
 from falcon_formation.create_teams import (
-    _assign_me_to_team_red,
+    _assign_me_to_team_one,
     _calculate_defense_number_difference,
     _calculate_goalie_number_difference,
     _calculate_skill_level_difference,
@@ -16,6 +16,7 @@ from falcon_formation.create_teams import (
     _generate_every_team_combination,
     choose_best_team,
     generate_output,
+    generate_output_goalie,
     get_players,
 )
 from falcon_formation.data_models import Player, TeamData, TeamMetrics
@@ -222,37 +223,43 @@ def test_generate_output() -> None:
         ),
         metrics=TeamMetrics(skill_difference=1, goalie_number_difference=0, defense_number_difference=0),
     )
+    jersey_colors = ("RED", "BLACK")
     players_with_missing_data = ["Willy Wing"]
     unknown_players = ["Adam Anonymus"]
 
-    output = generate_output(date, best_team, players_with_missing_data, unknown_players)
+    output, output_metadata = generate_output(
+        date,
+        best_team,
+        jersey_colors,
+        players_with_missing_data,
+        unknown_players,
+    )
 
     assert isinstance(output, str)
     assert output == textwrap.dedent("""\
-                                     Date: 2024-01-01
+        Team RED: (2)
+        Daniel Mizsak
+        George Goalie
 
-                                     Team 1: (2)
-                                     Daniel Mizsak
-                                     George Goalie
+        Team BLACK: (2)
+        David Defender
+        Gustavo Goalie""")
 
-                                     Team 2: (2)
-                                     David Defender
-                                     Gustavo Goalie
+    assert isinstance(output_metadata, str)
+    assert output_metadata == textwrap.dedent("""\
+        Date: 2024-01-01
+        Players with missing data: Willy Wing
+        Unknown players: Adam Anonymus
 
-                                     Players with missing data: Willy Wing
-                                     Unknown players: Adam Anonymus
-
-                                     Skill difference: 1
-                                     Goalie number difference: 0
-                                     Defense number difference: 0
-
-                                     """)
+        Skill difference: 1
+        Goalie number difference: 0
+        Defense number difference: 0""")
 
 
 def test_assign_me_to_team_red(team_data: list[Player]) -> None:
     for teams in _generate_every_team_combination(team_data):
         my_name = "Daniel Defender"
-        team_red, team_green = _assign_me_to_team_red(teams, my_name)
+        team_red, team_green = _assign_me_to_team_one(teams, my_name)
 
         assert isinstance(team_red, list)
         assert isinstance(team_green, list)
@@ -260,3 +267,28 @@ def test_assign_me_to_team_red(team_data: list[Player]) -> None:
         assert len(team_red) + len(team_green) == len(team_data)
         assert any(player.name == my_name for player in team_red)
         assert not any(player.name == my_name for player in team_green)
+
+
+def test_generate_output_goalie() -> None:
+    players = [
+        Player(name="Daniel Defender", skill=4, positions=("LD", "C")),
+    ]
+
+    output = generate_output_goalie(players)
+    assert isinstance(output, str)
+    assert output == "Oh-oh! No goalie registered for today's practice yet. Please reach out to other goalies."
+
+    players.append(Player(name="George Goalie", skill=3, positions=tuple("G")))
+    output = generate_output_goalie(players)
+    assert output == "Attention! Only 1 goalie registered for today's practice! Please reach out to other goalies."
+
+    players.append(Player(name="Gustavo Goalie", skill=5, positions=tuple("G")))
+    output = generate_output_goalie(players)
+    assert output == "Good news! There are exactly 2 goalies registered for today's practice."
+
+    players.append(Player(name="Guseppe Goalie", skill=2, positions=tuple("G")))
+    output = generate_output_goalie(players)
+    expected_output = (
+        "Ok, it looks like more than 2 goalies registered for today's practice. I guess we will make it work somehow."
+    )
+    assert output == expected_output
