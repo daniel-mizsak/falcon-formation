@@ -47,5 +47,7 @@ def falcon_formation(team_name: str, goalie: bool = False) -> tuple[str, str]:  
     # Randomly choose one of the best team combinations
     best_team = choose_best_team(players)
 
+    jersey_colors = JERSEY_COLORS[team_name.upper()]
+
     # Create output
-    return generate_output(date, best_team, JERSEY_COLORS[team_name], players_with_missing_data, unknown_players)
+    return generate_output(date, best_team, jersey_colors, players_with_missing_data, unknown_players)
