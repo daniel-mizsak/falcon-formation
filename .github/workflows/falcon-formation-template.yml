@@ -78,7 +78,8 @@ jobs:
 
       - name: Separate message into output and metadata
         run: |
-          IFS='---' read -r OUTPUT METADATA <<< "${{ env.MESSAGE }}"
+          OUTPUT=$(echo "${{ env.MESSAGE }}" | awk -F '---' '{print $1}')
+          METADATA=$(echo "${{ env.MESSAGE }}" | awk -F '---' '{print $2}')
           echo "OUTPUT=$OUTPUT" >> "$GITHUB_ENV"
           echo "METADATA=$METADATA" >> "$GITHUB_ENV"
 
