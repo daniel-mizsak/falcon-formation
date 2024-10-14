@@ -76,12 +76,21 @@ jobs:
             ${{ env.MESSAGE }}
             EOF
 
-      - name: Separate message into output and metadata
+      - name: Get output part of message
         run: |
-          OUTPUT=$(echo "${{ env.MESSAGE }}" | awk -F '---' '{print $1}')
-          METADATA=$(echo "${{ env.MESSAGE }}" | awk -F '---' '{print $2}')
-          echo "OUTPUT=$OUTPUT" >> "$GITHUB_ENV"
-          echo "METADATA=$METADATA" >> "$GITHUB_ENV"
+          {
+            echo 'OUTPUT<<EOF'
+            echo "${{ env.MESSAGE }}" | awk 'BEGIN {RS="---"; ORS="\n"} NR==1 {print $0}'
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Get metadata part of message
+        run: |
+          {
+            echo 'METADATA<<EOF'
+            echo "${{ env.MESSAGE }}" | awk 'BEGIN {RS="---"; ORS="\n"} NR==2 {print $0}'
+            echo EOF
+          } >> "$GITHUB_ENV"
 
       - name: Save message file as artifact
         uses: actions/upload-artifact@v4
