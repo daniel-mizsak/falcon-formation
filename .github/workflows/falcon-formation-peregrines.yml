@@ -12,8 +12,7 @@ on:
       goalie:
         description: "Run falcon-formation in goalie mode"
         type: boolean
-        required: false
-        default: false
+        required: true
 
 jobs:
   falcon-formation-peregrines:
