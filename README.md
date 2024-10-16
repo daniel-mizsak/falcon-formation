@@ -12,7 +12,14 @@ Create evenly distributed hockey teams.
 
 
 ## Getting started
-The program works by getting the registered players for the given day's practice through the [holdsport api](https://github.com/Holdsport/holdsport-api), and takes the corresponding players from a local file where their preferred position and skill level is stored.
+To use the `falcon-formation` bot and automatically generate teams for your practices, the following steps are needed:
+- Add `Bot Falcon Formation` to you Holdsport team. It does NOT need admin rights and it will not register to any practice, nor will it pay membership fee, but this is needed to query the registered players for every event.
+- Fill out a Google Sheet form with data about your players. The skill can be self-assigned or determined by the coach, but the names should not be changed and the `Positions` field should be filled according to the examples.
+- Create a Telegram channel and add `@falcon_formation_bot` to it. It is recommended to add multiple people so that the message is ensured to be forwarded to holdsports. The ID of the channel is needed for the message delivery. (From experience it looks like that when a group reaches 10 members, the ID of the conversation changes so it has to be updated.)
+- Share some final minor details, such as how much time before each practice should the bot fire and what jersey colors are used by the teams.
+
+## How does it work?
+The program works by getting the registered players for the given day's practice through the [holdsport api](https://github.com/Holdsport/holdsport-api), and taking the corresponding players from a local file where their preferred position and skill level is stored.
 
 Then the teams are generated so that:
 - The number of players in each team is as equal as possible
