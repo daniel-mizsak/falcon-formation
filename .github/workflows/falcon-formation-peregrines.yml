@@ -3,7 +3,7 @@ on:
   # Run cron job every Monday at 10:00 for goalies and 21:15 for practice,
   # and every Wednesday at 10:00 for goalies and 20:00 for practice.
   schedule:
-    - cron: "00 11 * * 1" # "00 8 * * 1"
+    - cron: "00 8 * * 1"
     - cron: "15 19 * * 1"
     - cron: "00 8 * * 3"
     - cron: "00 18 * * 3"
@@ -32,7 +32,7 @@ jobs:
 
   falcon-formation-goalie-peregrines:
     uses: ./.github/workflows/falcon-formation-template.yml
-    if: github.event.schedule == '00 11 * * 1' || github.event.schedule == '00 8 * * 3' || inputs.goalie == true
+    if: github.event.schedule == '00 8 * * 1' || github.event.schedule == '00 8 * * 3' || inputs.goalie == true
     with:
       team_name: FALCONS_1
       goalie: true
