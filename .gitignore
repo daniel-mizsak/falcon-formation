@@ -1,7 +1,9 @@
 # Project
 data/**/*.csv
 data/**/*.json
+!data/team_example.json
 encrypt.sh
+visualization.ipynb
 
 # System
 .DS_Store

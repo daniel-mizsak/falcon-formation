@@ -14,4 +14,5 @@ GOALIE_RETURN_DICTIONARY: dict[int, str] = {
 
 JERSEY_COLORS: dict[str, tuple[str, str]] = {
     "FALCONS_1": ("RED", "BLACK"),
+    "FALCONS_3": ("RED", "GREEN"),
 }
