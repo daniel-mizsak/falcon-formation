@@ -9,43 +9,18 @@ from pathlib import Path
 
 from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
-from flask import Flask, redirect, send_file
-from werkzeug import Response
 
 from falcon_formation.data_models import Player
 from falcon_formation.data_operations import load_config, load_team_data, save_team_data
 from falcon_formation.holdsport_api import get_upcoming_practice_dates
+from falcon_formation.server import available_teams, server
 
 # Load configuration values
 config_path = ".env"
-available_teams = ["falcons_1"]
-
-server = Flask(__name__)
 
 
-@server.route("/")
-def home() -> str:
-    """Home page of the server."""
-    return "The app is working!"
-
-
-@server.route("/teams/<team>")
-def redirect_to_team(team: str) -> Response:
-    """Redirect to the team-specific dashboard.
-
-    Args:
-        team (str): Team name.
-
-    Returns:
-        Response: Redirect response to the team-specific dashboard.
-    """
-    if team not in available_teams:
-        return redirect("/")
-    return redirect(f"/dash/{team}")
-
-
-app = Dash(__name__, server=server, url_base_pathname="/dash/")
-app.layout = html.Div(
+add_guests_app = Dash(__name__, server=server, url_base_pathname="/add_guests/")
+add_guests_app.layout = html.Div(
     [
         dcc.Location(id="url", refresh=True),
         dcc.Store(id="redirect-flag", data=False),
@@ -115,7 +90,7 @@ app.layout = html.Div(
 )
 
 
-@app.callback(  # type: ignore[misc]
+@add_guests_app.callback(  # type: ignore[misc]
     [
         Output("url", "pathname"),
         Output("redirect-flag", "data"),
@@ -132,7 +107,7 @@ def redirect_invalid_url(pathname: str) -> tuple[str, bool]:
     return pathname, False
 
 
-@app.callback(  # type: ignore[misc]
+@add_guests_app.callback(  # type: ignore[misc]
     [
         Output("loading-output", "children"),
         Output("practice-date-picker", "min_date_allowed"),
@@ -185,7 +160,7 @@ def update_date_picker(
     return None, min_allowed_date, max_allowed_date, initial_date, disabled_days
 
 
-@app.callback(  # type: ignore[misc]
+@add_guests_app.callback(  # type: ignore[misc]
     [
         Output("submit-button", "disabled"),
     ],
@@ -222,7 +197,7 @@ def update_submit_button_disabled_status(
     return (False,)
 
 
-@app.callback(  # type: ignore[misc]
+@add_guests_app.callback(  # type: ignore[misc]
     [
         Output("submit-confirm", "message"),
         Output("submit-confirm", "displayed"),
@@ -269,7 +244,7 @@ def update_submit_confirm_message(
     return "", False
 
 
-@app.callback(  # type: ignore[misc]
+@add_guests_app.callback(  # type: ignore[misc]
     [
         Output("player-data-table", "data"),
         Output("player-name-input", "value"),
@@ -339,22 +314,3 @@ def update_player_data_table(  # noqa: PLR0913
         {"name": name, "skill": skill, "positions": positions} for name, skill, positions in data_table_values
     ]
     return data_table, name, skill, positions
-
-
-@server.route("/extras/<team_name>/<practice_date>")
-def serve_json(team_name: str, practice_date: str) -> Response:
-    """Serve the JSON file containing the extra players for the given team and practice date.
-
-    Args:
-        team_name (str): Name of the team.
-        practice_date (str): Date of the practice in the format "YYYY-MM-DD".
-
-    Returns:
-        Response: JSON file containing the extra players for the given date.
-    """
-    file_path = Path(f"data/extras/{team_name.upper()}_{practice_date}.json").resolve()
-    return send_file(file_path, mimetype="application/json")
-
-
-if __name__ == "__main__":
-    server.run(host="0.0.0.0")
