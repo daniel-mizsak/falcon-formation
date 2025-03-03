@@ -1,0 +1,42 @@
+requires = ["tox"]
+env_list = ["py3.12", "codecov", "ruff", "mypy"]
+skip_missing_interpreters = true
+
+[gh.python]
+  "3.12" = ["3.12", "codecov", "ruff", "mypy"]
+
+[env_run_base]
+  description = "Run tests."
+  deps = ["aioresponses", "mongomock", "pytest", "pytest-asyncio"]
+  commands = [["pytest"]]
+
+[env.codecov]
+  description = "Run coverage report."
+  deps = ["aioresponses", "mongomock", "pytest", "pytest-asyncio", "pytest-cov"]
+  commands = [
+    [
+      "pytest",
+      "--cov=tests",
+      "--cov-config=pyproject.toml",
+      "--cov-report=term-missing",
+      "--cov-fail-under=100",
+    ],
+    [
+      "pytest",
+      "--cov=falcon_formation",
+      "--cov-config=pyproject.toml",
+      "--cov-report=term-missing",
+      "--cov-fail-under=60",
+      "--cov-report=xml:{work_dir}/artifacts/coverage.xml",
+    ],
+  ]
+
+[env.ruff]
+  description = "Lint and format the code."
+  deps = ["ruff"]
+  commands = [["ruff", "check", "src", "tests"]]
+
+[env.mypy]
+  description = "Static type checking."
+  deps = ["mypy", "pytest-asyncio"]
+  commands = [["mypy", "src", "tests"]]
