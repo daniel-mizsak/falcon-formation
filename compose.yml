@@ -31,9 +31,9 @@ services:
       - "traefik.http.routers.falcon-formation.entrypoints=websecure"
       - "traefik.http.routers.falcon-formation.tls.certresolver=production"
       - "com.centurylinklabs.watchtower.enable=true"
-    deploy:
-      mode: replicated
-      replicas: 3
+    # deploy:
+    #   mode: replicated
+    #   replicas: 3
     environment:
       HOLDSPORT_USERNAME: ${HOLDSPORT_USERNAME}
       HOLDSPORT_PASSWORD: ${HOLDSPORT_PASSWORD}
