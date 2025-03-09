@@ -1,0 +1,46 @@
+---
+on:
+  workflow_call:
+    inputs:
+      goalie:
+        description: "Whether to run falcon-formation in goalie mode."
+        type: boolean
+        required: false
+        default: false
+
+    secrets:
+      team_id:
+        required: true
+      telegram_chat_id:
+        required: true
+
+jobs:
+  falcon-formation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send request to falcon-formation web application
+        run: >
+          curl --request GET --url https://ff.mlops.top/create_teams?team_id=${{ secrets.team_id }}
+
+      - name: Wait for application to process request
+        run: >
+          sleep 45
+
+      - name: Get generated teams
+        run: >
+          curl --request GET --url https://ff.mlops.top/get_teams?team_id=${{ secrets.team_id }} --output teams.txt
+
+      - name: Save teams to environment variable
+        run: |
+          {
+            echo 'TEAMS<<EOF'
+            cat teams.txt
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Send teams on Telegram
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.telegram_chat_id }}
+          token: ${{ secrets.telegram_token }}
+          message: ${{ env.TEAMS }}
