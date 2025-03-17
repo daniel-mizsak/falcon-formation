@@ -22,8 +22,11 @@ from falcon_formation.holdsport_api import HoldsportAPI
 # from falcon_formation.telegram_api import TelegramAPI  # noqa: ERA001
 
 server: Flask = Flask(__name__)
+server.url_map.strict_slashes = False
+
 database = FalconFormationDatabase(
-    host="mongo",
+    # host="mongo",
+    host="localhost",
     port=27017,
     username=str(os.getenv(MONGO_USERNAME_KEY)),
     password=str(os.getenv(MONGO_PASSWORD_KEY)),
@@ -56,5 +59,7 @@ import falcon_formation.server.routes  # noqa: E402, F401
 from falcon_formation.server.add_guests import add_guests_app  # noqa: E402, F401
 from falcon_formation.server.edit_team import edit_team_app  # noqa: E402, F401
 from falcon_formation.server.manage_team import manage_team_app  # noqa: E402, F401
+
+add_guests_app.logger.disabled = False
 
 __all__ = ["server"]

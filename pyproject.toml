@@ -1,12 +1,12 @@
 # Build System
 [build-system]
-  requires = ["hatchling", "hatch-vcs"]
+  requires = ["hatchling"]
   build-backend = "hatchling.build"
 
 # Project Metadata
 [project]
   name = "falcon-formation"
-  dynamic = ["version"]
+  version = "0.1.0"
   description = "Create evenly distributed hockey teams."
   readme = "README.md"
   requires-python = ">=3.12"
@@ -41,9 +41,6 @@
   [tool.hatch.build.targets.wheel]
     packages = ["src/falcon_formation"]
 
-  [tool.hatch.version]
-    source = "vcs"
-
 # MyPy
 [tool.mypy]
   ignore_missing_imports = true
@@ -57,7 +54,7 @@
 # Pytest
 [tool.pytest.ini_options]
   testpaths = ["tests"]
-  asyncio_default_fixture_loop_scope = "session"
+  asyncio_default_fixture_loop_scope = "function"
 
 # Coverage
 [tool.coverage.report]

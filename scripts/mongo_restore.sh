@@ -8,4 +8,5 @@ docker exec falcon-formation-mongo-1 mongorestore \
     --password "${MONGO_PASSWORD}" \
     --archive="${BACKUP_DIRECTORY}/${BACKUP_DATE}.gz" \
     --gzip \
-    --drop
+    --drop \
+    --nsExclude="admin.*"

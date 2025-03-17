@@ -112,12 +112,11 @@ def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None, N
         Output("jersey-color-1-input", "value"),
         Output("jersey-color-2-input", "value"),
         Output("telegram-chat-id-input", "value"),
-        Output("loading-output", "children", allow_duplicate=True),
+        Output("loading-output", "children"),
     ],
     [
         Input("team-id", "data"),
     ],
-    prevent_initial_call=True,
 )
 def display_team_metadata(team_id: int) -> tuple[list[dict[str, str]], str, str, str, int, None]:
     """Load and display the metadata of the team.

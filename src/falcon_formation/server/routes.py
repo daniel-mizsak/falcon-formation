@@ -15,10 +15,11 @@ from falcon_formation.server import parse_search_parameters, server
 @server.route("/")
 def home() -> str:
     """Home."""
+    # TODO: Add number of teams and the number of team distributions that have been generated.
     return "Application is working."
 
 
-@server.route("/create_teams")
+@server.route("/create_teams/")
 def create_teams_route() -> Response:
     """Create teams."""
     team_id = parse_search_parameters(request.query_string.decode())
@@ -28,24 +29,24 @@ def create_teams_route() -> Response:
     executor = concurrent.futures.ThreadPoolExecutor()
     executor.submit(create_teams, team_id)
 
-    return Response("Creating teams...", content_type="text/plain")
+    return Response("Creating teams...", content_type="text/plain; charset=utf-8")
 
 
-@server.route("/get_teams")
+@server.route("/get_teams/")
 def get_teams_route() -> Response:
     """Get teams."""
     team_id = parse_search_parameters(request.query_string.decode())
     if not team_id:
         abort(400, "Missing team id")
 
-    return Response(get_teams(team_id), content_type="text/plain")
+    return Response(get_teams(team_id), content_type="text/plain; charset=utf-8")
 
 
-@server.route("/get_goalie_number")
+@server.route("/get_goalie_number/")
 def get_goalie_number_route() -> Response:
     """Get goalie number."""
     team_id = parse_search_parameters(request.query_string.decode())
     if not team_id:
         abort(400, "Missing team id")
 
-    return Response(get_goalie_number(team_id), content_type="text/plain")
+    return Response(get_goalie_number(team_id), content_type="text/plain; charset=utf-8")

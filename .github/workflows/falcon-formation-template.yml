@@ -32,11 +32,9 @@ jobs:
 
       - name: Save teams to environment variable
         run: |
-          {
-            echo 'TEAMS<<EOF'
-            cat teams.txt
-            echo EOF
-          } >> "$GITHUB_ENV"
+            echo 'TEAMS<<EOF' >> "$GITHUB_ENV"
+            cat teams.txt >> "$GITHUB_ENV"
+            echo EOF >> "$GITHUB_ENV"
 
       - name: Send teams on Telegram
         uses: appleboy/telegram-action@master

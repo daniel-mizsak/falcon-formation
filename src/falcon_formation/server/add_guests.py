@@ -11,6 +11,7 @@ from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import Guest, Position, Skill
+from falcon_formation.main import load_registered_guests, load_registered_members
 from falcon_formation.server import database, holdsport_api, parse_search_parameters, server
 
 # TODO: Add a limit of how many guests will be used for team generation.
@@ -29,24 +30,10 @@ add_guests_app.layout = html.Div(
             ],
         ),
         # Layout
-        html.H2("Practice date:"),
-        html.Br(),
+        html.H2(id="practice-date-label", children="Practice date:"),
         dcc.DatePickerSingle(
             id="practice-date-picker",
             first_day_of_week=1,
-        ),
-        html.Br(),
-        html.Br(),
-        html.H2("Guests:"),
-        dash_table.DataTable(
-            id="guests-data-table",
-            columns=[
-                {"name": "Player Name", "id": "_id"},
-                {"name": "Skill Level", "id": "skill"},
-                {"name": "Primary position", "id": "position"},
-            ],
-            data=[],
-            row_deletable=True,
         ),
         html.Br(),
         html.H2("Player name:"),
@@ -84,6 +71,19 @@ add_guests_app.layout = html.Div(
         dcc.ConfirmDialog(
             id="submit-confirm",
         ),
+        html.Br(),
+        html.Br(),
+        html.H2("Guests:"),
+        dash_table.DataTable(
+            id="guests-data-table",
+            columns=[
+                {"name": "Player Name", "id": "_id"},
+                {"name": "Skill Level", "id": "skill"},
+                {"name": "Primary position", "id": "position"},
+            ],
+            data=[],
+            row_deletable=True,
+        ),
     ],
 )
 
@@ -116,11 +116,12 @@ def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None]:
         Output("practice-date-picker", "max_date_allowed"),
         Output("practice-date-picker", "date"),
         Output("practice-date-picker", "disabled_days"),
-        Output("loading-output", "children"),
+        Output("loading-output", "children", allow_duplicate=True),
     ],
     [
         Input("team-id", "data"),
     ],
+    prevent_initial_call="initial_duplicate",
 )
 def display_date_picker(
     team_id: int,
@@ -158,6 +159,25 @@ def display_date_picker(
             disabled_days.append(date)
 
     return (min_allowed_date, max_allowed_date, initial_date, disabled_days, None)
+
+
+@add_guests_app.callback(  # type: ignore[misc]
+    [
+        Output("practice-date-label", "children"),
+        Output("loading-output", "children"),
+    ],
+    [
+        Input("team-id", "data"),
+        Input("practice-date-picker", "date"),
+    ],
+)
+def update_practice_date_label(team_id: int, practice_date: datetime.date) -> tuple[str]:
+    if not team_id or not practice_date:
+        raise PreventUpdate
+
+    guests = load_registered_guests(team_id, practice_date)
+    members = load_registered_members(team_id, practice_date)
+    return (f"Practice date:   (Members: {len(members)}, Guests: {len(guests)})", None)
 
 
 @add_guests_app.callback(  # type: ignore[misc]
