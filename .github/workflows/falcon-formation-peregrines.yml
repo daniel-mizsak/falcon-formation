@@ -25,6 +25,7 @@ jobs:
     secrets:
       team_id: ${{ secrets.FALCONS_1_TEAM_ID }}
       telegram_chat_id: ${{ secrets.FALCONS_1_TELEGRAM_CHAT_ID }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}
 
   falcon-formation-peregrines-goalie:
     uses: ./.github/workflows/falcon-formation-template.yml
@@ -34,3 +35,4 @@ jobs:
     secrets:
       team_id: ${{ secrets.FALCONS_1_TEAM_ID }}
       telegram_chat_id: ${{ secrets.FALCONS_1_TELEGRAM_CHAT_ID }}
+      telegram_token: ${{ secrets.TELEGRAM_TOKEN }}

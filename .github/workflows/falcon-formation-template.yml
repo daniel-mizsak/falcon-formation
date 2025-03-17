@@ -13,7 +13,8 @@ on:
         required: true
       telegram_chat_id:
         required: true
-
+      telegram_token:
+        required: true
 jobs:
   falcon-formation:
     runs-on: ubuntu-latest
@@ -32,10 +33,6 @@ jobs:
 
       - name: Ensure file ends with newline
         run: echo "" >> teams.txt
-
-      - name: Print file content
-        run: >
-          cat teams.txt
 
       - name: Save teams to environment variable
         run: |
