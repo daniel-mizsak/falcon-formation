@@ -32,7 +32,12 @@ jobs:
           curl --request GET --url https://ff.mlops.top/get_teams?team_id=${{ secrets.team_id }} --output teams.txt
 
       - name: Ensure file ends with newline
-        run: echo "" >> teams.txt
+        run: >
+          echo "" >> teams.txt
+
+      - name: Print file content
+        run: >
+          cat teams.txt
 
       - name: Save teams to environment variable
         run: |
@@ -41,6 +46,10 @@ jobs:
             cat teams.txt
             echo 'EOF'
           } >> "$GITHUB_ENV"
+
+      - name: Echo teams content
+        run: >
+          echo ${{ env.TEAMS }}
 
       - name: Send teams on Telegram
         uses: appleboy/telegram-action@master
