@@ -176,8 +176,11 @@ def test_member_from_dict(member: Member) -> None:
     assert Member.from_dict(member_dict) == member
 
 
-def test_member_str(member: Member) -> None:
-    assert str(member) == "Member Name  💪300  ⏩"
+def test_member_to_string(member: Member) -> None:
+    assert member.to_string(show_skill=True, show_position=True, show_guest=True) == "Member Name  💪300  ⏩"
+    assert member.to_string(show_skill=False, show_position=True, show_guest=True) == "Member Name  ⏩"
+    assert member.to_string(show_skill=True, show_position=False, show_guest=True) == "Member Name  💪300"
+    assert member.to_string(show_skill=False, show_position=False, show_guest=False) == "Member Name"
 
 
 # Guest
@@ -220,8 +223,9 @@ def test_guest_from_dict(guest: Guest) -> None:
     assert Guest.from_dict(guest_dict) == guest
 
 
-def test_guest_str(guest: Guest) -> None:
-    assert str(guest) == "Guest Name  💪300  ⏩  👤"
+def test_guest_to_string(guest: Guest) -> None:
+    assert guest.to_string(show_skill=True, show_position=True, show_guest=True) == "Guest Name  💪300  ⏩  👤"
+    assert guest.to_string(show_skill=True, show_position=True, show_guest=False) == "Guest Name  💪300  ⏩"
 
 
 # TeamDistributionMetrics

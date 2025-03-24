@@ -12,6 +12,11 @@ from aioresponses import aioresponses
 from falcon_formation.holdsport_api import HoldsportAPI
 
 
+@pytest.fixture
+def holdsport_api() -> HoldsportAPI:
+    return HoldsportAPI("username", "password")
+
+
 @pytest.mark.asyncio
 async def test_get_users_attending_activity(holdsport_api: HoldsportAPI) -> None:
     with aioresponses() as m:

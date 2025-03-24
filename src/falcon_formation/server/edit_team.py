@@ -10,7 +10,8 @@ from dash import Dash, Input, Output, State, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import Member, Position, Skill
-from falcon_formation.server import database, holdsport_api, parse_search_parameters, server
+from falcon_formation.falcon_formation import database, holdsport_api
+from falcon_formation.server import parse_search_parameters, server
 
 edit_team_app = Dash(__name__, server=server, url_base_pathname="/edit_team/")
 edit_team_app.layout = html.Div(
@@ -70,9 +71,10 @@ edit_team_app.layout = html.Div(
 )
 def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None]:
     """Redirect to the main page if cannot validate team id against the database."""
-    team_id = parse_search_parameters(search)
-    if team_id is None:
+    team_id_value = parse_search_parameters(search).get("team_id")
+    if team_id_value is None:
         return ("/", None)
+    team_id = int(team_id_value)
 
     if not database.team_metadata_exists(team_id):
         return ("/", None)

@@ -15,37 +15,35 @@ on:
         required: true
       telegram_token:
         required: true
+
 jobs:
   falcon-formation:
     runs-on: ubuntu-latest
     steps:
-      - name: Send request to falcon-formation web application
-        run: >
+      - name: Create teams
+        if: ${{ inputs.goalie == false }}
+        run: |
           curl --request GET --url https://ff.mlops.top/create_teams?team_id=${{ secrets.team_id }}
-
-      - name: Wait for application to process request
-        run: >
           sleep 45
+          curl --request GET --url https://ff.mlops.top/get_teams?team_id=${{ secrets.team_id }} --output message.txt
 
-      - name: Get generated teams
-        run: >
-          curl --request GET --url https://ff.mlops.top/get_teams?team_id=${{ secrets.team_id }} --output teams.txt
-
-      - name: Ensure file ends with newline
-        run: >
-          echo "" >> teams.txt
+      - name: Get goalie number
+        if: ${{ inputs.goalie == true }}
+        run: |
+          curl --request GET --url https://ff.mlops.top/get_goalie_number?team_id=${{ secrets.team_id }} --output message.txt
 
       - name: Save teams to environment variable
         run: |
+          echo "" >> message.txt
           {
-            echo 'TEAMS<<EOF'
-            cat teams.txt
+            echo 'MESSAGE<<EOF'
+            cat message.txt
             echo 'EOF'
           } >> "$GITHUB_ENV"
 
-      - name: Send teams on Telegram
+      - name: Send message on Telegram
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.telegram_chat_id }}
           token: ${{ secrets.telegram_token }}
-          message: ${{ env.TEAMS }}
+          message: ${{ env.MESSAGE }}

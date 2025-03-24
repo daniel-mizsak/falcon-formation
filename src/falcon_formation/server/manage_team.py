@@ -10,7 +10,8 @@ from dash import Dash, Input, Output, State, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import TeamMetadata
-from falcon_formation.server import database, holdsport_api, parse_search_parameters, server  # TODO: Add telegram API
+from falcon_formation.falcon_formation import database, holdsport_api
+from falcon_formation.server import parse_search_parameters, server  # TODO: Add telegram API
 
 manage_team_app = Dash(__name__, server=server, url_base_pathname="/manage_team/")
 manage_team_app.layout = html.Div(
@@ -89,9 +90,10 @@ manage_team_app.layout = html.Div(
 )
 def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None, None]:
     """Redirect to the main page if cannot validate team id against the database or Holdsport API."""
-    team_id = parse_search_parameters(search)
-    if team_id is None:
+    team_id_value = parse_search_parameters(search).get("team_id")
+    if team_id_value is None:
         return ("/", None, None)
+    team_id = int(team_id_value)
 
     if database.team_metadata_exists(team_id):
         return (pathname, team_id, None)

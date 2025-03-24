@@ -6,7 +6,8 @@ Dash app interface for registering the winner of a specific practice.
 
 from dash import Dash, Input, Output, dcc, html
 
-from falcon_formation.server import database, parse_search_parameters, server
+from falcon_formation.falcon_formation import database
+from falcon_formation.server import parse_search_parameters, server
 
 register_winner_app = Dash(__name__, server=server, url_base_pathname="/register_winner/")
 register_winner_app.layout = html.Div(
@@ -54,9 +55,10 @@ register_winner_app.layout = html.Div(
 )
 def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None]:
     """Redirect to the main page if cannot validate team id against the database."""
-    team_id = parse_search_parameters(search)
-    if team_id is None:
+    team_id_value = parse_search_parameters(search).get("team_id")
+    if team_id_value is None:
         return ("/", None)
+    team_id = int(team_id_value)
 
     if not database.team_metadata_exists(team_id):
         return ("/", None)

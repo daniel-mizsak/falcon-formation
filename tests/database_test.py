@@ -4,8 +4,16 @@ Tests for the MongoDB database.
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
+import mongomock
+import pytest
+
 from falcon_formation.data_models import Guest, Member, TeamDistribution, TeamMetadata
 from falcon_formation.database import FalconFormationDatabase
+
+
+@pytest.fixture
+def database() -> FalconFormationDatabase:
+    return FalconFormationDatabase(client=mongomock.MongoClient())
 
 
 # TeamMetadata

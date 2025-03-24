@@ -4,28 +4,9 @@ Short description and source of base code.
 @author "Daniel Mizsak" <info@pythonvilag.hu>
 """
 
-import mongomock
 import pytest
 
 from falcon_formation.data_models import Guest, Member, TeamDistribution, TeamDistributionMetrics, TeamMetadata
-from falcon_formation.database import FalconFormationDatabase
-from falcon_formation.holdsport_api import HoldsportAPI
-from falcon_formation.telegram_api import TelegramAPI
-
-
-@pytest.fixture
-def holdsport_api() -> HoldsportAPI:
-    return HoldsportAPI("username", "password")
-
-
-@pytest.fixture
-def telegram_api() -> TelegramAPI:
-    return TelegramAPI("token")
-
-
-@pytest.fixture
-def database() -> FalconFormationDatabase:
-    return FalconFormationDatabase(client=mongomock.MongoClient())
 
 
 @pytest.fixture

@@ -10,6 +10,11 @@ from aioresponses import aioresponses
 from falcon_formation.telegram_api import TelegramAPI
 
 
+@pytest.fixture
+def telegram_api() -> TelegramAPI:
+    return TelegramAPI("token")
+
+
 @pytest.mark.asyncio
 async def test_get_chat_id(telegram_api: TelegramAPI) -> None:
     with aioresponses() as m:

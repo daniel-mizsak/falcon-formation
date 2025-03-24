@@ -57,11 +57,14 @@ class Player(ABC):
     def from_dict(cls, data: dict[str, str]) -> Player:
         """Return the player data from a dictionary."""
 
-    def __str__(self: Player) -> str:
+    def to_string(self: Player, show_skill: bool, show_position: bool, show_guest: bool) -> str:  # noqa: FBT001
         """Return the player data as a string.
 
         Args:
             self (Player): The Player object.
+            show_skill (bool): Whether to show the skill.
+            show_position (bool): Whether to show the position.
+            show_guest (bool): Whether to show the guest emoji.
 
         Returns:
             str: The player data as a string.
@@ -71,4 +74,12 @@ class Player(ABC):
         guest_emoji = "  👤" if isinstance(self, Guest) else ""
         position_emoji = Position(self.position).emoji
 
-        return f"{self.name}  💪{self.skill}  {position_emoji}{guest_emoji}"
+        player_string = f"{self.name}"
+        if show_skill:
+            player_string += f"  💪{self.skill}"
+        if show_position:
+            player_string += f"  {position_emoji}"
+        if show_guest:
+            player_string += guest_emoji
+
+        return player_string

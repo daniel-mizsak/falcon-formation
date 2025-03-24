@@ -11,8 +11,8 @@ from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import Guest, Position, Skill
-from falcon_formation.main import load_registered_guests, load_registered_members
-from falcon_formation.server import database, holdsport_api, parse_search_parameters, server
+from falcon_formation.falcon_formation import database, holdsport_api, load_registered_guests, load_registered_members
+from falcon_formation.server import parse_search_parameters, server
 
 # TODO: Add a limit of how many guests will be used for team generation.
 add_guests_app = Dash(__name__, server=server, url_base_pathname="/add_guests/")
@@ -30,7 +30,8 @@ add_guests_app.layout = html.Div(
             ],
         ),
         # Layout
-        html.H2(id="practice-date-label", children="Practice date:"),
+        html.H2(id="registered-player-number-label", children="Currently registered player number:"),
+        html.H2("Practice date:"),
         dcc.DatePickerSingle(
             id="practice-date-picker",
             first_day_of_week=1,
@@ -100,9 +101,10 @@ add_guests_app.layout = html.Div(
 )
 def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None]:
     """Redirect to the main page if cannot validate team id against the database."""
-    team_id = parse_search_parameters(search)
-    if team_id is None:
+    team_id_value = parse_search_parameters(search).get("team_id")
+    if team_id_value is None:
         return ("/", None)
+    team_id = int(team_id_value)
 
     if not database.team_metadata_exists(team_id):
         return ("/", None)
@@ -112,16 +114,40 @@ def redirect_invalid_url(pathname: str, search: str) -> tuple[str, int | None]:
 
 @add_guests_app.callback(  # type: ignore[misc]
     [
-        Output("practice-date-picker", "min_date_allowed"),
-        Output("practice-date-picker", "max_date_allowed"),
-        Output("practice-date-picker", "date"),
-        Output("practice-date-picker", "disabled_days"),
+        Output("registered-player-number-label", "children"),
         Output("loading-output", "children", allow_duplicate=True),
     ],
     [
         Input("team-id", "data"),
+        Input("practice-date-picker", "date"),
     ],
     prevent_initial_call="initial_duplicate",
+)
+def update_registered_player_number_label(team_id: int, practice_date: datetime.date) -> tuple[str, None]:
+    """Load and display the registered members and guests."""
+    if not team_id or not practice_date:
+        raise PreventUpdate
+
+    guests = load_registered_guests(team_id, str(practice_date))
+    members = load_registered_members(team_id, str(practice_date))
+    registered_player_number_label = (
+        "Currently registered player number: "
+        f"{len(members) + len(guests)} (Members: {len(members)}, Guests: {len(guests)})"
+    )
+    return (registered_player_number_label, None)
+
+
+@add_guests_app.callback(  # type: ignore[misc]
+    [
+        Output("practice-date-picker", "min_date_allowed"),
+        Output("practice-date-picker", "max_date_allowed"),
+        Output("practice-date-picker", "date"),
+        Output("practice-date-picker", "disabled_days"),
+        Output("loading-output", "children"),
+    ],
+    [
+        Input("team-id", "data"),
+    ],
 )
 def display_date_picker(
     team_id: int,
@@ -159,25 +185,6 @@ def display_date_picker(
             disabled_days.append(date)
 
     return (min_allowed_date, max_allowed_date, initial_date, disabled_days, None)
-
-
-@add_guests_app.callback(  # type: ignore[misc]
-    [
-        Output("practice-date-label", "children"),
-        Output("loading-output", "children"),
-    ],
-    [
-        Input("team-id", "data"),
-        Input("practice-date-picker", "date"),
-    ],
-)
-def update_practice_date_label(team_id: int, practice_date: datetime.date) -> tuple[str]:
-    if not team_id or not practice_date:
-        raise PreventUpdate
-
-    guests = load_registered_guests(team_id, practice_date)
-    members = load_registered_members(team_id, practice_date)
-    return (f"Practice date:   (Members: {len(members)}, Guests: {len(guests)})", None)
 
 
 @add_guests_app.callback(  # type: ignore[misc]

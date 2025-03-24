@@ -7,18 +7,43 @@ Helper functions for creating hockey teams.
 from __future__ import annotations
 
 import asyncio
+import os
 import random
 from datetime import UTC, datetime, timedelta
 from itertools import combinations
 from typing import TYPE_CHECKING
 
+from falcon_formation import (
+    HOLDSPORT_PASSWORD_KEY,
+    HOLDSPORT_USERNAME_KEY,
+    MONGO_PASSWORD_KEY,
+    MONGO_USERNAME_KEY,
+    # TELEGRAM_TOKEN_KEY,
+)
 from falcon_formation.data_models import Guest, Member, TeamDistribution, TeamDistributionMetrics
-from falcon_formation.server import database, holdsport_api
+from falcon_formation.database import FalconFormationDatabase
+from falcon_formation.holdsport_api import HoldsportAPI
+
+# from falcon_formation.telegram_api import TelegramAPI  # noqa: ERA001
 
 if TYPE_CHECKING:
     from collections.abc import Generator
 
     from falcon_formation.data_models import Player
+
+
+database = FalconFormationDatabase(
+    # host="mongo",
+    host="localhost",
+    port=27017,
+    username=str(os.getenv(MONGO_USERNAME_KEY)),
+    password=str(os.getenv(MONGO_PASSWORD_KEY)),
+)
+holdsport_api = HoldsportAPI(
+    login=str(os.getenv(HOLDSPORT_USERNAME_KEY)),
+    password=str(os.getenv(HOLDSPORT_PASSWORD_KEY)),
+)
+# telegram_api = TelegramAPI(token=str(os.getenv(TELEGRAM_TOKEN_KEY)))  # noqa: ERA001
 
 
 def create_teams(team_id: int) -> None:
@@ -35,11 +60,14 @@ def create_teams(team_id: int) -> None:
     create_team_distribution(players, team_id, date)
 
 
-def get_teams(team_id: int) -> str:
+def get_teams(team_id: int, show_skill: bool, show_position: bool, show_guest: bool) -> str:  # noqa: FBT001
     """Get the previously created teams for the given team id.
 
     Args:
         team_id (int): The id of the team in the Holdsport system.
+        show_skill (bool): Whether to show the skill.
+        show_position (bool): Whether to show the position.
+        show_guest (bool): Whether to show the guest emoji.
 
     Returns:
         str: The formatted string of the teams.
@@ -56,10 +84,16 @@ def get_teams(team_id: int) -> str:
     output = ""
     output = f"Date: {team_distribution.date}\n\n"
     output += f"Team {team_metadata.jersey_color_1}: ({len(team_distribution.team_1)})\n"
-    output += "\n".join([str(player) for player in team_distribution.team_1]) + "\n\n"
+    output += (
+        "\n".join([player.to_string(show_skill, show_position, show_guest) for player in team_distribution.team_1])
+        + "\n\n"
+    )
 
     output += f"Team {team_metadata.jersey_color_2}: ({len(team_distribution.team_2)})\n"
-    output += "\n".join([str(player) for player in team_distribution.team_2]) + "\n\n"
+    output += (
+        "\n".join([player.to_string(show_skill, show_position, show_guest) for player in team_distribution.team_2])
+        + "\n\n"
+    )
 
     output += f"Goalie number difference: {team_distribution.metrics.goalie_number_difference}\n"
     output += f"Defense number difference: {team_distribution.metrics.defense_number_difference}\n"
