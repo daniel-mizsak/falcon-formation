@@ -33,8 +33,7 @@ if TYPE_CHECKING:
 
 
 database = FalconFormationDatabase(
-    # host="mongo",
-    host="localhost",
+    host="mongo",
     port=27017,
     username=str(os.getenv(MONGO_USERNAME_KEY)),
     password=str(os.getenv(MONGO_PASSWORD_KEY)),

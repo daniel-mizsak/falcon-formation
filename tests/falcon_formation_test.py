@@ -7,7 +7,7 @@ Short description and source of base code.
 import pytest
 
 from falcon_formation.data_models import Guest, Member, Player, TeamDistributionMetrics
-from falcon_formation.falcon_formation import (
+from falcon_formation.main import (
     _assign_me_to_team_one,
     _calculate_team_combination_metrics,
     _generate_every_team_combination,

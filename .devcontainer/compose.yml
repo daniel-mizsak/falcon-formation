@@ -1,37 +1,12 @@
 services:
-  watchtower:
-    image: docker.io/containrrr/watchtower:latest
-    restart: unless-stopped
-    command:
-      - "--label-enable"
-      - "--interval"
-      - "30"
-      - "--rolling-restart"
+  falcon-formation-devcontainer:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
+    container_name: falcon-formation-devcontainer
+    tty: true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
-  traefik:
-    image: docker.io/library/traefik:v3.1:latest
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /traefik/:/etc/traefik/
-
-  falcon-formation:
-    image: ghcr.io/daniel-mizsak/falcon-formation:latest
-    restart: unless-stopped
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.falcon-formation.rule=Host(`ff.mlops.top`)"
-      - "traefik.http.routers.falcon-formation.entrypoints=websecure"
-      - "traefik.http.routers.falcon-formation.tls.certresolver=production"
-      - "com.centurylinklabs.watchtower.enable=true"
-    deploy:
-      mode: replicated
-      replicas: 3
+      - ./../:/workspace
     environment:
       HOLDSPORT_USERNAME: ${HOLDSPORT_USERNAME}
       HOLDSPORT_PASSWORD: ${HOLDSPORT_PASSWORD}
@@ -42,7 +17,7 @@ services:
     image: mongo:latest
     restart: unless-stopped
     volumes:
-      - ./mongo_backup:/backup
+      - ./../mongo_backup:/mongo_backup
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 5s

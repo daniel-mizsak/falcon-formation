@@ -1,0 +1,69 @@
+services:
+  watchtower:
+    image: docker.io/containrrr/watchtower:latest
+    restart: unless-stopped
+    command:
+      - "--label-enable"
+      - "--interval"
+      - "30"
+      - "--rolling-restart"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  traefik:
+    image: docker.io/library/traefik:v3.1:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /traefik/:/etc/traefik/
+
+  falcon-formation:
+    image: ghcr.io/daniel-mizsak/falcon-formation:latest
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.falcon-formation.rule=Host(`ff.mlops.top`)"
+      - "traefik.http.routers.falcon-formation.entrypoints=websecure"
+      - "traefik.http.routers.falcon-formation.tls.certresolver=production"
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      mode: replicated
+      replicas: 3
+    environment:
+      HOLDSPORT_USERNAME: ${HOLDSPORT_USERNAME}
+      HOLDSPORT_PASSWORD: ${HOLDSPORT_PASSWORD}
+      MONGO_USERNAME: ${MONGO_USERNAME}
+      MONGO_PASSWORD: ${MONGO_PASSWORD}
+
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - ./mongo_backup:/mongo_backup
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+
+  mongo-express:
+    image: mongo-express:latest
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: true
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_BASICAUTH: true

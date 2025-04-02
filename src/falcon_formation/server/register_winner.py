@@ -6,7 +6,7 @@ Dash app interface for registering the winner of a specific practice.
 
 from dash import Dash, Input, Output, dcc, html
 
-from falcon_formation.falcon_formation import database
+from falcon_formation.main import database
 from falcon_formation.server import parse_search_parameters, server
 
 register_winner_app = Dash(__name__, server=server, url_base_pathname="/register_winner/")

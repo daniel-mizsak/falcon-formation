@@ -8,7 +8,7 @@ import concurrent.futures
 
 from flask import Response, abort, request
 
-from falcon_formation.falcon_formation import create_teams, get_goalie_number, get_teams
+from falcon_formation.main import create_teams, get_goalie_number, get_teams
 from falcon_formation.server import parse_search_parameters, server
 
 

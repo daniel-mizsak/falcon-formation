@@ -11,7 +11,7 @@ from dash import Dash, Input, Output, State, ctx, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import Guest, Position, Skill
-from falcon_formation.falcon_formation import database, holdsport_api, load_registered_guests, load_registered_members
+from falcon_formation.main import database, holdsport_api, load_registered_guests, load_registered_members
 from falcon_formation.server import parse_search_parameters, server
 
 # TODO: Add a limit of how many guests will be used for team generation.

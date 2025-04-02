@@ -10,7 +10,7 @@ from dash import Dash, Input, Output, State, dash_table, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import Member, Position, Skill
-from falcon_formation.falcon_formation import database, holdsport_api
+from falcon_formation.main import database, holdsport_api
 from falcon_formation.server import parse_search_parameters, server
 
 edit_team_app = Dash(__name__, server=server, url_base_pathname="/edit_team/")

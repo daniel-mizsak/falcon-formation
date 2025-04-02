@@ -18,7 +18,7 @@
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.12",
   ]
-  dependencies = ["aiohttp", "dash", "flask", "gunicorn", "pymongo"]
+  dependencies = ["aiohttp", "dash==2.18.2", "flask", "gunicorn", "pymongo"]
   [project.optional-dependencies]
     dev = [
       "aioresponses",

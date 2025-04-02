@@ -10,7 +10,7 @@ from dash import Dash, Input, Output, State, dcc, html
 from dash.exceptions import PreventUpdate
 
 from falcon_formation.data_models import TeamMetadata
-from falcon_formation.falcon_formation import database, holdsport_api
+from falcon_formation.main import database, holdsport_api
 from falcon_formation.server import parse_search_parameters, server  # TODO: Add telegram API
 
 manage_team_app = Dash(__name__, server=server, url_base_pathname="/manage_team/")

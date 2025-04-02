@@ -4,10 +4,10 @@ on:
   # Run cron job every Monday at 10:00 for goalies and 21:15 for practice,
   # and every Wednesday at 10:00 for goalies and 20:00 for practice.
   schedule:
-    - cron: "00 9 * * 1"
-    - cron: "15 20 * * 1"
-    - cron: "00 9 * * 3"
-    - cron: "00 19 * * 3"
+    - cron: "00 8 * * 1"
+    - cron: "15 19 * * 1"
+    - cron: "00 8 * * 3"
+    - cron: "00 18 * * 3"
   workflow_dispatch:
     inputs:
       goalie:
@@ -21,7 +21,7 @@ on:
 jobs:
   falcon-formation-peregrines:
     uses: ./.github/workflows/falcon-formation-template.yml
-    if: github.event.schedule == '15 20 * * 1' || github.event.schedule == '00 19 * * 3' || inputs.goalie == 'false'
+    if: github.event.schedule == '15 19 * * 1' || github.event.schedule == '00 18 * * 3' || inputs.goalie == 'false'
     secrets:
       team_id: ${{ secrets.FALCONS_1_TEAM_ID }}
       telegram_chat_id: ${{ secrets.FALCONS_1_TELEGRAM_CHAT_ID }}
@@ -29,7 +29,7 @@ jobs:
 
   falcon-formation-peregrines-goalie:
     uses: ./.github/workflows/falcon-formation-template.yml
-    if: github.event.schedule == '00 9 * * 1' || github.event.schedule == '00 9 * * 3' || inputs.goalie == 'true'
+    if: github.event.schedule == '00 8 * * 1' || github.event.schedule == '00 8 * * 3' || inputs.goalie == 'true'
     with:
       goalie: true
     secrets:

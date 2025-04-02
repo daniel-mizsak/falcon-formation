@@ -1,0 +1,7 @@
+{
+    "name": "Falcon Formation Development Environment",
+    "dockerComposeFile": "compose.yml",
+    "service": "falcon-formation-devcontainer",
+    "workspaceFolder": "/workspace",
+    "postCreateCommand": "pip install -e '.[dev]'"
+}
