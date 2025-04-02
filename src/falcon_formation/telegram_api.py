@@ -50,3 +50,29 @@ class TelegramAPI:
             if chat.get("title") == group_name and chat.get("type") in ["group", "supergroup"]:
                 return int(chat["id"])
         return None
+
+    async def send_message(
+        self: TelegramAPI,
+        chat_id: int,
+        text: str,
+    ) -> bool:
+        """Send a message to the given chat id.
+
+        Args:
+            self (TelegramAPI): The TelegramAPI object.
+            chat_id (int): The chat id of the group.
+            text (str): The text of the message.
+
+        Returns:
+            bool: True if the message was sent successfully, False otherwise.
+        """
+        url = f"https://api.telegram.org/bot{self.token}/sendMessage"
+        params: dict[str, str] = {
+            "chat_id": str(chat_id),
+            "text": text,
+        }
+        async with (
+            aiohttp.ClientSession(timeout=self.timeout) as session,
+            session.get(url, headers=self.headers, params=params) as response,
+        ):
+            return response.status == STATUS_CODE_OK
